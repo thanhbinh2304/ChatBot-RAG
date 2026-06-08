@@ -1,0 +1,185 @@
+[
+  {
+    "id": "process_001",
+    "process_name": "Quy trình bán hàng khách lẻ",
+    "module": "Bán hàng",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Thủ kho",
+      "Nhân viên kỹ thuật",
+      "Khách hàng"
+    ],
+    "precondition": "Khách hàng đặt hàng",
+    "tags": [
+      "bán",
+      "hàng",
+      "khách",
+      "lẻ"
+    ],
+    "content": "Tên quy trình: Bán hàng khách lẻ\nTác nhân: Nhân viên bán hàng, thủ kho, nhân viên kỹ thuật, khách hàng\nĐiều kiện đầu vào: Khách hàng đặt hàng\nLuồng sự kiện chính:\n  - HĐ1: Khách hàng gọi điện hoặc đến trực tiếp nhà phân phối có nhu cầu mua hàng\n  - HĐ2: Khách hàng đọc mã sổ gas hoặc yêu cầu tư vấn và phát sổ gas mới\n  - HĐ3: Nhân viên bán hàng tiếp nhận thông tin và tư vấn mua hàng phù hợp với số lượng tồn. Nếu số lượng chưa đáp ứng: chuyển sang HĐ4. Nếu đồng ý: chuyển sang HĐ6. Nếu không đồng ý: kết thúc quy trình\n  - HĐ4: Nhân viên bán hàng trao đổi thông tin với thủ kho\n  - HĐ5: Thủ kho tiếp nhận thông tin. Nếu đáp ứng hoặc không đáp ứng: quay lại HĐ3. Nếu khách đồng ý đợi nhập hàng: chuyển sang quy trình nhập hàng\n  - HĐ6: Nhân viên bán hàng kiểm tra khuyến mại cho khách hàng\n  - HĐ7: Nhân viên bán hàng lập phiếu xuất hàng và giao cho nhân viên kỹ thuật\n  - HĐ8: Nhân viên kỹ thuật nhận đơn và kiểm tra hàng\n  - HĐ9: Nhân viên kỹ thuật vận chuyển và lắp đặt đến khách hàng\n  - HĐ10: Nhân viên kỹ thuật nhận thanh toán và thu vỏ gas tương ứng. Nếu khách hàng thanh toán đủ và có vỏ gas tương ứng: chuyển đến HĐ12. Nếu khách hàng hẹn công nợ (tiền hoặc vỏ gas) thì phải báo cho nhân viên bán hàng hoặc chủ cửa hàng để xác nhận thông tin và chuyển đến HĐ12\n  - HĐ12: Nhân viên kỹ thuật gửi thông tin thanh toán cho nhân viên bán hàng\n  - HĐ13: Nhân viên bán hàng ghi nhận thông tin thanh toán, chuyển sang quy trình theo dõi công nợ (nếu có) và kết thúc quy trình\nKết quả: Hóa đơn xuất hàng, thông tin thanh toán."
+  },
+  {
+    "id": "process_002",
+    "process_name": "Quy trình bán hàng khách đại lý",
+    "module": "Bán hàng",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Thủ kho",
+      "Nhân viên kỹ thuật",
+      "Khách hàng"
+    ],
+    "precondition": "Khách hàng đặt hàng",
+    "tags": [
+      "bán",
+      "hàng",
+      "khách",
+      "đại",
+      "lý"
+    ],
+    "content": "Tên quy trình: Bán hàng khách đại lý\nTác nhân: Nhân viên bán hàng, thủ kho, nhân viên kỹ thuật, khách hàng\nĐiều kiện đầu vào: Khách hàng đặt hàng\nLuồng sự kiện chính:\n  - HĐ1: Khách hàng gọi điện có nhu cầu mua hàng hoặc Nhân viên bán hàng gọi điện mời chào hàng\n  - HĐ2: Nhân viên bán hàng tiếp nhận thông tin và tư vấn mua hàng phù hợp với số lượng tồn. Nếu số lượng chưa đáp ứng: chuyển sang HĐ3. Nếu đồng ý: chuyển sang HĐ5. Nếu không đồng ý: kết thúc quy trình\n  - HĐ3: Nhân viên bán hàng trao đổi thông tin với thủ kho\n  - HĐ4: Thủ kho tiếp nhận thông tin. Nếu đáp ứng hoặc không đáp ứng: quay lại HĐ2. Nếu khách đồng ý đợi nhập hàng: chuyển sang quy trình nhập hàng\n  - HĐ5: Nhân viên bán hàng kiểm tra khuyến mại cho khách hàng\n  - HĐ6: Nhân viên bán hàng quay về HĐ1 cho đến khi sắp xếp được tuyến đường đi\n  - HĐ7: Nhân viên bán hàng lập phiếu xuất hàng, giao cho nhân viên kỹ thuật và nhân viên lái xe, gửi thông báo tổng số lượng cho thủ kho\n  - HĐ8: Thủ kho tiếp nhận thông tin và chuẩn bị hàng\n  - HĐ9: Nhân viên kỹ thuật kiểm tra hàng và vận chuyển đến khách hàng\n  - HĐ10: Nhân viên kỹ thuật nhận thanh toán và thu vỏ gas tương ứng. Nếu khách hàng thanh toán đủ và có vỏ gas tương ứng: chuyển đến HĐ11. Nếu khách hàng hẹn công nợ (tiền hoặc vỏ gas) thì phải báo cho nhân viên bán hàng hoặc chủ cửa hàng để xác nhận thông tin và chuyển đến HĐ11\n  - HĐ11: Nhân viên kỹ thuật gửi thông tin thanh toán cho nhân viên bán hàng\n  - HĐ12: Nhân viên bán hàng ghi nhận thông tin thanh toán, chuyển sang quy trình theo dõi công nợ (nếu có) và kết thúc quy trình\nKết quả: Hóa đơn xuất hàng, thông tin thanh toán."
+  },
+  {
+    "id": "process_003",
+    "process_name": "Quy trình nhập hàng",
+    "module": "Kho hàng",
+    "actors": [
+      "Thủ kho",
+      "Chủ cửa hàng",
+      "Nhà cung cấp"
+    ],
+    "precondition": "Có yêu cầu nhập hàng",
+    "tags": [
+      "nhập",
+      "hàng"
+    ],
+    "content": "Tên quy trình: Nhập hàng\nTác nhân: Thủ kho, chủ cửa hàng, nhà cung cấp\nĐiều kiện đầu vào: Có yêu cầu nhập hàng\nLuồng sự kiện chính:\n  - HĐ1: Thủ kho đề xuất nhập hàng tới chủ cửa hàng\n  - HĐ2: Chủ cửa hàng xử lý thông tin đề xuất. Nếu đồng ý: chuyển sang HĐ3. Nếu không đồng ý: kết thúc quy trình\n  - HĐ3: Chủ cửa hàng gọi nhập hàng\n  - HĐ4: Nhà cung cấp tiếp nhận thông tin. Nếu đáp ứng: chuyển sang HĐ5. Nếu không đáp ứng: kết thúc quy trình\n  - HĐ5: Nhà cung cấp xác nhận thông tin nhập hàng tới chủ cửa hàng và gửi hàng\n  - HĐ6: Chủ cửa hàng tiếp nhận và gửi thông tin nhập hàng cho thủ kho\n  - HĐ7: Thủ kho tiếp nhận thông tin và kiểm tra khi hàng được giao đến. Nếu hàng được giao đến không khớp: chuyển sang HĐ8. Nếu hàng được giao đến khớp với những thông tin được chủ cửa hàng gửi: chuyển sang HĐ10\n  - HĐ8: Thủ kho báo cáo thông tin hàng được giao đến không khớp with thông tin chủ cửa hàng cung cấp\n  - HĐ9: Chủ cửa hàng xử lý thông tin với nhà cung cấp. Nếu đồng ý chuyển sang HĐ10. Nếu không đồng ý kết thúc quy trình\n  - HĐ10: Thủ kho lập hóa đơn nhập hàng\n  - HĐ11: Chủ cửa hàng xử lý thanh toán và kết thúc quy trình\nKết quả: Hóa đơn nhập hàng, thông tin thanh toán."
+  },
+  {
+    "id": "process_004",
+    "process_name": "Quy trình kiểm hàng hóa tại kho",
+    "module": "Kho hàng",
+    "actors": [
+      "Thủ kho",
+      "Chủ cửa hàng"
+    ],
+    "precondition": "Theo yêu cầu từ chủ cửa hàng hoặc kỳ kiểm kê",
+    "tags": [
+      "kiểm",
+      "hàng",
+      "hóa",
+      "tại",
+      "kho"
+    ],
+    "content": "Tên quy trình: Kiểm hàng hóa tại kho\nTác nhân: Thủ kho, chủ cửa hàng\nĐiều kiện đầu vào: Theo yêu cầu từ chủ cửa hàng hoặc kỳ kiểm kê\nLuồng sự kiện chính:\n  - HĐ1: Chủ cửa hàng nắm được số lượng hàng hóa theo sổ sách trước khi kiểm thực tế\n  - HĐ2: Thủ kho tiến hành kiểm kê theo hàng hóa và đối chiếu với số lượng số liệu trước khi kiểm. Nếu sai lệch chuyển sang HĐ3. Nếu không sai lệch chuyển sang HĐ5\n  - HĐ3: Thủ kho xác định nguyên nhân sai lệch và giải trình với chủ cửa hàng\n  - HĐ4: Chủ cửa hàng kiểm tra tính xác thực của nguyên nhân. Nếu sai quay lại HĐ3. Nếu đúng chuyển sang HĐ5\n  - HĐ5: Thủ kho cập nhật lại số lượng tồn hàng hóa và kết thúc quy trình\nKết quả: Số lượng hàng hóa thực tế."
+  },
+  {
+    "id": "process_005",
+    "process_name": "Quy trình kiểm hàng hóa tại cửa hàng",
+    "module": "Cửa hàng",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Chủ cửa hàng"
+    ],
+    "precondition": "Khi bắt đầu và kết thúc làm việc hoặc theo yêu cầu từ chủ cửa hàng",
+    "tags": [
+      "kiểm",
+      "hàng",
+      "hóa",
+      "tại",
+      "cửa",
+      "hàng"
+    ],
+    "content": "Tên quy trình: Kiểm hàng hóa tại cửa hàng\nTác nhân: Nhân viên bán hàng, chủ cửa hàng\nĐiều kiện đầu vào: Khi bắt đầu và kết thúc làm việc hoặc theo yêu cầu từ chủ cửa hàng\nLuồng sự kiện chính:\n  - HĐ1: Nhân viên bán hàng và Chủ cửa hàng nắm được số lượng hàng hóa theo sổ sách trước khi kiểm thực tế\n  - HĐ2: Nhân viên bán hàng tiến hành kiểm kê theo hàng hóa và đối chiếu với số lượng số liệu trước khi kiểm. Nếu sai lệch chuyển sang HĐ3. Nếu không sai lệch chuyển sang HĐ5\n  - HĐ3: Nhân viên bán hàng xác định nguyên nhân sai lệch và giải trình với chủ cửa hàng\n  - HĐ4: Chủ cửa hàng kiểm tra tính xác thực của nguyên nhân. Nếu sai quay lại HĐ3. Nếu đúng chuyển sang HĐ5\n  - HĐ5: Nhân viên bán hàng cập nhật lại số lượng tồn hàng hóa và kết thúc quy trình\nKết quả: Số lượng hàng hóa thực tế."
+  },
+  {
+    "id": "process_006",
+    "process_name": "Quy trình điều chuyển hàng hóa",
+    "module": "Kho hàng",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Thủ kho"
+    ],
+    "precondition": "Khi có yêu cầu điều chuyển hàng hóa giữa kho và cửa hàng",
+    "tags": [
+      "điều",
+      "chuyển",
+      "hàng",
+      "hóa"
+    ],
+    "content": "Tên quy trình: Điều chuyển hàng hóa\nTác nhân: Nhân viên bán hàng, thủ kho\nĐiều kiện đầu vào: Khi có yêu cầu điều chuyển hàng hóa giữa kho và cửa hàng\nLuồng sự kiện chính:\n  - HĐ1: Nhân viên bán hàng hoặc Thủ kho gửi yêu cầu muốn điều chuyển hàng hóa\n  - HĐ2: Xác nhận khả năng đáp ứng nhu cầu. Nếu không đáp ứng thì kết thúc quy trình. Nếu đáp ứng chuyển sang HĐ3\n  - HĐ3: Giao cho nhân viên kỹ thuật/nhân viên lái xe vận chuyển\n  - HĐ4: Nhân viên bán hàng hoặc Thủ kho nhận và kiểm tra hàng hóa. Nếu đúng thông tin ban đầu chuyển sang HĐ5. Nếu không đúng thông tin thì trao đổi lại, nếu chấp nhận chuyển sang HĐ5. Nếu không đúng thông tin mà trao đổi lại không chấp nhận thì kết thúc quy trình\n  - HĐ5: Cập nhật số lượng tồn hàng hóa và kết thúc quy trình\nKết quả: Số lượng hàng hóa sau khi trao đổi."
+  },
+  {
+    "id": "process_007",
+    "process_name": "Quy trình theo dõi công nợ khách hàng",
+    "module": "Công nợ",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Nhân viên kỹ thuật"
+    ],
+    "precondition": "Khi công nợ đã được xác nhận (có phiếu nợ)",
+    "tags": [
+      "theo",
+      "dõi",
+      "công",
+      "nợ",
+      "khách",
+      "hàng"
+    ],
+    "content": "Tên quy trình: Theo dõi công nợ khách hàng\nTác nhân: Nhân viên bán hàng, nhân viên kỹ thuật\nĐiều kiện đầu vào: Khi công nợ đã được xác nhận (có phiếu nợ)\nLuồng sự kiện chính:\n  - HĐ1: Nhân viên bán hàng tiếp nhận thông tin thanh toán, phiếu nợ của khách hàng\n  - HĐ2: Nhân viên bán hàng xác định thời gian hẹn nợ. Nếu thời gian trong các tháng tiếp theo thì sắp xếp vào danh sách các tháng: chuyển sang HĐ3. Nếu thời gian trong tháng hiện tại thì phải lưu ý để đến hẹn đi lấy: chuyển sang HĐ4\n  - HĐ3: Nhân viên bán hàng trong những ngày cuối tháng, rà soát lại công nợ của tháng tiếp theo để nắm được thời gian hẹn\n  - HĐ4: Khi đến ngày hẹn, nhân viên bán hàng gọi điện thông báo công nợ. Nếu khách hàng hẹn nợ tiếp hoặc nợ một phần: chuyển sang HĐ5. Nếu khách hàng không hẹn nợ tiếp: chuyển sang HĐ6\n  - HĐ5: Nhân viên bán hàng quyết định hoặc hỏi ý kiến chủ cửa hàng (với các khách hàng đặc biệt). Nếu đồng ý khách hàng nợ tiếp: ghi nhận thông tin and kết thúc quy trình. Nếu đồng ý khách hàng nợ một phần: ghi nhận thông tin và chuyển sang HĐ6. Nếu không đồng ý: phản hồi lại với khách hàng và chuyển sang HĐ6\n  - HĐ6: Nhân viên bán hàng giao cho nhân viên kỹ thuật đi lấy công nợ khách hàng\n  - HĐ7: Nhân viên kỹ thuật tiếp nhận thông tin và đi lấy nợ. Nếu khách hàng không thanh toán công nợ: báo cáo nhân viên bán hàng hoặc chủ cửa hàng, quay về HĐ5. Nếu khách hàng thanh toán đủ: Nhận thanh toán và chuyển sang HĐ8\n  - HĐ8: Nhân viên kỹ thuật gửi thông tin thanh toán cho nhân viên bán hàng\n  - HĐ9: Nhân viên bán hàng ghi nhận thông tin thanh toán và kết thúc quy trình\nKết quả: Danh sách công nợ đến hạn/quá hạn, cập nhật tình trạng thanh toán."
+  },
+  {
+    "id": "process_008",
+    "process_name": "Quy định mốc quà tặng trong sổ gas",
+    "module": "Khuyến mại",
+    "actors": [
+      "Nhân viên bán hàng",
+      "Khách hàng"
+    ],
+    "precondition": "Khách hàng mua gas và có sổ gas ghi nhận",
+    "tags": [
+      "mốc",
+      "quà tặng",
+      "sổ gas",
+      "khuyến mại"
+    ],
+    "content": "Tên quy trình: Quy định mốc quà tặng trong sổ gas\nTác nhân: Nhân viên bán hàng, khách hàng\nĐiều kiện đầu vào: Khách hàng mua gas và tích lũy số lần đổi gas trong sổ gas\nLuồng sự kiện chính:\n  - Bước 1: Khách hàng đổi gas và đưa sổ gas cho nhân viên ghi nhận.\n  - Bước 2: Nhân viên đối chiếu số lần đổi gas hiện tại của khách hàng với các mốc nhận quà tặng quy định cụ thể:\n    + Bình thứ 1: Tặng 1 bát tô\n    + Bình thứ 3: Tặng Đôi lót tay\n    + Bình thứ 6: Tặng 1 dao inox\n    + Bình thứ 10: Tặng hộp đựng gia vị\n    + Bình thứ 43: Tặng 1 bộ bát\n    + Bình thứ 49: Tặng dao đa năng\n    + Bình thứ 57: Tặng bộ nồi inox 3 chiếc\n  - Bước 3: Nếu đạt mốc, nhân viên tiến hành trao quà tặng tương ứng cho khách hàng và đánh dấu đã nhận quà.\n  - Bước 4: Chu kỳ reset: Sau khi hoàn thành đổi bình thứ 57, sổ gas cũ sẽ hết hiệu lực. Nhân viên thu hồi sổ cũ, phát sổ mới cho khách hàng và đếm lại từ đầu (bình thứ 1).\nKết quả: Khách hàng nhận quà theo mốc tích lũy và được cấp sổ mới khi kết thúc chu kỳ."
+  },
+  {
+    "id": "process_009",
+    "process_name": "Quy trình lắp đặt gas",
+    "module": "Kỹ thuật",
+    "actors": [
+      "Nhân viên kỹ thuật"
+    ],
+    "precondition": "Nhân viên kỹ thuật tiến hành thay hoặc lắp bình gas mới cho khách hàng",
+    "tags": [
+      "quy định",
+      "lắp đặt",
+      "an toàn",
+      "thay bình gas"
+    ],
+    "content": "Tên quy trình: Quy định lắp đặt gas\nTác nhân: Nhân viên kỹ thuật\nĐiều kiện đầu vào: Nhân viên kỹ thuật đến nhà khách hàng để giao và thay bình gas\nLuồng sự kiện chính:\n  - Bước 1: Tắt bếp, khóa bình gas và tháo van.\n  - Bước 2: Thay bình mới, đặt van cân bằng với khóa bình rồi vặn chặt.\n  - Bước 3: Mở khóa bình 2/3 để lượng gas ra vừa đủ.\n  - Bước 4: Nhấn xả e 2 lần (nút bấm hình giống đuôi của đũa).\n  - Bước 5: Pha ít xà phòng rửa bát, bôi quanh đoạn nối van và khóa bình, đoạn van và dây gas để kiểm tra rò rỉ.\n  - Bước 6: Bật bếp, nếu thấy có mùi hoặc nổi bọt khí ở xà phòng thì tắt bếp, khóa van và quay lại bước 2 kiểm tra.\n  - Bước 7: Ghi sổ khuyến mại.\n  - Bước 8: Mang vỏ cũ về.\nKết quả: Bình gas được lắp đặt an toàn, khách hàng có thể sử dụng bình thường."
+  },
+  {
+    "id": "process_010",
+    "process_name": "Thông tin doanh nghiệp và cơ cấu tổ chức",
+    "module": "Thông tin chung",
+    "actors": [
+      "Chủ cửa hàng",
+      "Nhân viên bán hàng",
+      "Thủ kho",
+      "Nhân viên kỹ thuật",
+      "Nhân viên lái xe"
+    ],
+    "precondition": "Tra cứu thông tin chung về nhà phân phối",
+    "tags": [
+      "thông tin",
+      "doanh nghiệp",
+      "cơ cấu",
+      "tổ chức",
+      "liên hệ",
+      "Tuấn Đạt"
+    ],
+    "content": "Tên thông tin: Giới thiệu thông tin doanh nghiệp và cơ cấu tổ chức\nĐơn vị: Nhà phân phối Gas Tuấn Đạt\nĐiều kiện đầu vào: Cần tra cứu thông tin chung về nhà phân phối\nNội dung chi tiết:\n1. Thông tin chung:\n - Nhà phân phối Gas Tuấn Đạt chuyên cung cấp khí gas phục vụ sinh hoạt và kinh doanh cho khách hàng cá nhân và đại lý trên địa bàn tỉnh. Hoạt động theo mô hình phân phối độc lập, quản lý tập trung.\n - Địa chỉ: Đường Quang Trung, phường Minh Xuân, Tuyên Quang.\n - Số điện thoại: 0376.123.678.\n - Fanpage: https://www.facebook.com/Showroom.TuanDat/\n2. Cơ cấu tổ chức:\n - Chủ cửa hàng: Chịu trách nhiệm cao nhất, quản lý nhân sự, làm việc với nhà cung cấp, theo dõi doanh thu, quyết định kế hoạch nhập hàng, chính sách giá và định hướng phát triển.\n - Nhân viên bán hàng: Trực tiếp tiếp xúc khách hàng, tư vấn, báo giá, chốt đơn, theo dõi công nợ, phối hợp với các bộ phận đảm bảo cung ứng.\n - Thủ kho: Quản lý, bảo quản hàng hóa trong kho, kiểm tra chất lượng/số lượng hàng nhập, sắp xếp kho an toàn, chuẩn bị hàng giao, kiểm kê và đề xuất nhập hàng.\n - Nhân viên kỹ thuật: Vận chuyển, lắp đặt hàng hóa, kiểm tra an toàn trước khi bàn giao, hỗ trợ bảo hành sửa chữa thiết bị.\n - Nhân viên lái xe: Lái xe tải vận chuyển hàng cho khách đại lý ở xa, phối hợp bốc xếp hàng hóa.\nKết quả: Cung cấp đầy đủ thông tin về địa chỉ, liên hệ và chức năng nhiệm vụ của từng vị trí trong nhà phân phối Gas Tuấn Đạt."
+  }
+]
