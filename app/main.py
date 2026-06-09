@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 import logging
+
+from app.pipeline.chat_pipeline import chat_pipeline
 
 logging.basicConfig(
     level = logging.INFO,
@@ -11,9 +14,22 @@ app= FastAPI(
     version = "1.0.0"
 )
 
+class ChatRequest(BaseModel):
+    session_id: str
+    query: str
+
 @app.get("/")
 def test():
     return {
         "status": "online",
         "message": "Welcome to my Chatbot Gas Tuan Dat!"
         }
+
+@app.post("/chat")
+def chat_endpoint(request: ChatRequest):
+    try:
+        result = chat_pipeline(request.session_id, request.query)
+        return result
+    except Exception as e:
+        logging.error(f"Lỗi khi xử lý chat: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

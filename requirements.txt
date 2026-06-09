@@ -4,10 +4,9 @@ pydantic-settings
 pgvector
 sqlalchemy
 psycopg2-binary
-langchain_text_splitters
-langchain
 ollama
 python-dotenv
 rank_bm25
 sentence-transformers
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch

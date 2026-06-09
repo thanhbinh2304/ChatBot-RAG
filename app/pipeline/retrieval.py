@@ -14,10 +14,10 @@ logging.basicConfig(
 _logger = logging.getLogger(__name__)
 
 # ── Cấu hình ──────────────────────────────────────────────
-OLLAMA_HOST  = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
+OLLAMA_HOST  = os.getenv("OLLAMA_HOST")
 EMBED_MODEL  = "bge-m3"
 RERANK_MODEL = "BAAI/bge-reranker-v2-m3"
-LLM_MODEL    = os.getenv("LLM_MODEL", "qwen3.5:4b-q4_K_M")  # dùng cho query rewriting
+REWRITING_MODEL    = ("qwen2.5:3b")  # dùng cho query rewriting
 DB_URL       = os.getenv("DATABASE_URL")
 TABLE_NAME   = '"Data_Embedding"'
 
@@ -58,7 +58,7 @@ Câu hỏi gốc: {original_query}
 Câu hỏi đã viết lại:"""
 
     response = ollama_client.chat(
-        model=LLM_MODEL,
+        model=REWRITING_MODEL,
         messages=[{"role": "user", "content": prompt}]
     )
     rewritten = response["message"]["content"].strip()
