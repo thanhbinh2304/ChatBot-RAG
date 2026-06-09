@@ -1,0 +1,618 @@
+[
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Tìm sổ gas của Nguyễn Văn A"
+    },
+    "output": "SELECT * FROM \"GasBook\" WHERE \"fullName\" ILIKE '%Nguyễn Văn A%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Tra cứu sổ gas SG0003"
+    },
+    "output": "SELECT * FROM \"GasBook\" WHERE \"gasBookCode\" = 'SG0003';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Tìm khách hàng có số điện thoại 0912345678"
+    },
+    "output": "SELECT * FROM \"GasBook\" WHERE \"phoneNumber\" = '0912345678';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)\nCustomerGroup(customerGroupid, groupName)",
+      "Question": "Lấy danh sách sổ gas thuộc một nhóm khách hàng cụ thể"
+    },
+    "output": "SELECT gb.* FROM \"GasBook\" gb JOIN \"CustomerGroup\" cg ON gb.\"customerGroupid\" = cg.\"customerGroupid\" WHERE cg.\"groupName\" ILIKE '%khách lẻ%' ORDER BY gb.\"fullName\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Liệt kê các sổ gas đang có nợ và sắp xếp theo số nợ giảm dần"
+    },
+    "output": "SELECT \"gasBookCode\", \"fullName\", \"debt\" FROM \"GasBook\" WHERE \"debt\" > 0 ORDER BY \"debt\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Top 10 sổ gas có điểm tích lũy cao nhất"
+    },
+    "output": "SELECT \"fullName\", \"points\" FROM \"GasBook\" ORDER BY \"points\" DESC LIMIT 10;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, fullName, gasBookCode)\nDebtReceipt(receiptId, gasBookId, receiptCode, dueDate, status)",
+      "Question": "Tìm các sổ gas có nợ quá hạn từ các phiếu nợ (DebtReceipt)"
+    },
+    "output": "SELECT gb.\"fullName\", gb.\"gasBookCode\", dr.\"receiptCode\", dr.\"dueDate\" FROM \"DebtReceipt\" dr JOIN \"GasBook\" gb ON dr.\"gasBookId\" = gb.\"gasBookId\" WHERE dr.\"status\" != 'Đã trả nợ' AND dr.\"dueDate\" < CURRENT_DATE;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)\nSaleInvoice(invoiceId, invoiceCode, invoiceDate, totalAmount, amountReceived, amountRemaining, discountAmount, invoiceStatus, invoiceType, note, gasBookId, customerId, employeeId, stockId)",
+      "Question": "Lấy lịch sử mua hàng của sổ gas SG0003"
+    },
+    "output": "SELECT si.\"invoiceCode\", si.\"invoiceDate\", si.\"totalAmount\" FROM \"SaleInvoice\" si JOIN \"GasBook\" gb ON si.\"gasBookId\" = gb.\"gasBookId\" WHERE gb.\"gasBookCode\" = 'SG0003' ORDER BY si.\"invoiceDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Tính tổng dư nợ hiện tại của tất cả các sổ gas trong hệ thống"
+    },
+    "output": "SELECT SUM(COALESCE(\"debt\", 0)) AS \"tongNoSoGas\" FROM \"GasBook\";"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)",
+      "Question": "Danh sách khách hàng có chu kỳ đổi gas bằng 1"
+    },
+    "output": "SELECT \"fullName\", \"gasBookCode\", \"phoneNumber\", \"cycle\" FROM \"GasBook\" WHERE \"cycle\" = 1;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInvoiceDetail(invoiceId, productId, quantity, unitPrice)\nSaleInvoice(invoiceId, orderType)",
+      "Question": "Top 5 sản phẩm bán chạy nhất"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", SUM(id.\"quantity\") AS TongBan, SUM(id.\"quantity\" * id.\"unitPrice\") AS DoanhThu FROM \"InvoiceDetail\" id JOIN \"Product\" p ON id.\"productId\" = p.\"productId\" JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" WHERE si.\"orderType\" = 'Xuathang' GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\" ORDER BY TongBan DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInventory(inventoryId, stockId, productId, quantity)",
+      "Question": "Sản phẩm sắp hết hàng (tồn kho < 20)"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", SUM(inv.\"quantity\") AS SoLuongTon FROM \"Inventory\" inv JOIN \"Product\" p ON inv.\"productId\" = p.\"productId\" GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\" HAVING SUM(inv.\"quantity\") < 20 ORDER BY SoLuongTon ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, customerId, totalAmount, orderType)",
+      "Question": "Số đơn hàng theo loại"
+    },
+    "output": "SELECT \"orderType\", COUNT(*) AS SoLuong, SUM(\"totalAmount\") AS TongTien FROM \"SaleInvoice\" GROUP BY \"orderType\";"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseDate, supplierId, totalAmount)",
+      "Question": "Tổng chi phí nhập theo tháng"
+    },
+    "output": "SELECT EXTRACT(YEAR FROM \"purchaseDate\") AS Nam, EXTRACT(MONTH FROM \"purchaseDate\") AS Thang, SUM(\"totalAmount\") AS ChiPhiNhap, COUNT(*) AS SoPhieu FROM \"PurchaseOrder\" GROUP BY EXTRACT(YEAR FROM \"purchaseDate\"), EXTRACT(MONTH FROM \"purchaseDate\") ORDER BY Nam DESC, Thang DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, customerId, totalAmount)",
+      "Question": "Tổng doanh thu theo tháng trong 12 tháng gần nhất"
+    },
+    "output": "SELECT EXTRACT(YEAR FROM \"invoiceDate\") AS Nam, EXTRACT(MONTH FROM \"invoiceDate\") AS Thang, SUM(\"totalAmount\") AS DoanhThu FROM \"SaleInvoice\" WHERE \"orderType\" = 'Xuathang' AND \"invoiceDate\" >= NOW() - INTERVAL '12 months' GROUP BY EXTRACT(YEAR FROM \"invoiceDate\"), EXTRACT(MONTH FROM \"invoiceDate\") ORDER BY Nam, Thang;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, fullName, phoneNumber, debt)\nSaleInvoice(invoiceId, customerId, totalAmount, orderType)",
+      "Question": "Top 5 khách hàng mua nhiều nhất"
+    },
+    "output": "SELECT c.\"customerId\", c.\"fullName\", c.\"phoneNumber\", COUNT(si.\"invoiceId\") AS SoDon, SUM(si.\"totalAmount\") AS TongTien FROM \"Customer\" c JOIN \"SaleInvoice\" si ON c.\"customerId\" = si.\"customerId\" WHERE si.\"orderType\" = 'Xuathang' GROUP BY c.\"customerId\", c.\"fullName\", c.\"phoneNumber\" ORDER BY TongTien DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Supplier(supplierId, fullName, phoneNumber, debt)",
+      "Question": "Nhà cung cấp nợ nhiều nhất"
+    },
+    "output": "SELECT \"supplierId\", \"fullName\", \"phoneNumber\", \"debt\" FROM \"Supplier\" WHERE \"debt\" > 0 ORDER BY \"debt\" DESC LIMIT 20;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseCode, purchaseDate, supplierId, totalAmount)",
+      "Question": "Phiếu nhập mới nhất"
+    },
+    "output": "SELECT \"purchaseId\", \"purchaseCode\", \"purchaseDate\", \"supplierId\", \"totalAmount\" FROM \"PurchaseOrder\" ORDER BY \"purchaseDate\" DESC LIMIT 10;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceCode, invoiceDate, customerId, totalAmount, orderType)",
+      "Question": "Đơn xuất chưa hoàn thành"
+    },
+    "output": "SELECT \"invoiceId\", \"invoiceCode\", \"invoiceDate\", \"customerId\", \"totalAmount\" FROM \"SaleInvoice\" WHERE \"orderType\" != 'Xuathang' OR \"orderType\" IS NULL ORDER BY \"invoiceDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost, unit)",
+      "Question": "Danh sách tất cả sản phẩm"
+    },
+    "output": "SELECT \"productId\", \"productCode\", \"productName\", \"cost\", \"unit\" FROM \"Product\" ORDER BY \"productCode\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)",
+      "Question": "Tìm sản phẩm theo tên"
+    },
+    "output": "SELECT \"productId\", \"productCode\", \"productName\", \"cost\" FROM \"Product\" WHERE \"productName\" ILIKE 'giá trị' OR \"productCode\" ILIKE 'giá trị' ORDER BY \"productName\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Sản phẩm theo danh mục"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\", c.\"categoryName\" FROM \"Product\" p LEFT JOIN \"ProductCategory\" c ON p.\"categoryId\" = c.\"categoryId\" WHERE c.\"categoryId\" = :param ORDER BY p.\"productName\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInventory(inventoryId, productId, quantity)",
+      "Question": "Giá trị tồn kho theo sản phẩm"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\", SUM(inv.\"quantity\") AS SoLuong, SUM(inv.\"quantity\" * p.\"cost\") AS GiaTriTon FROM \"Inventory\" inv JOIN \"Product\" p ON inv.\"productId\" = p.\"productId\" GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\" ORDER BY GiaTriTon DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInventory(inventoryId, productId, quantity)",
+      "Question": "Tổng giá trị tồn kho"
+    },
+    "output": "SELECT SUM(inv.\"quantity\" * p.\"cost\") AS TongGiaTriTon, COUNT(DISTINCT p.\"productId\") AS SoMatHang, SUM(inv.\"quantity\") AS TongSoLuong FROM \"Inventory\" inv JOIN \"Product\" p ON inv.\"productId\" = p.\"productId\";"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInvoiceDetail(invoiceId, productId, quantity, unitPrice)\nSaleInvoice(invoiceId, orderType)",
+      "Question": "Sản phẩm không bán được (không có trong hóa đơn)"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\" FROM \"Product\" p WHERE p.\"productId\" NOT IN (SELECT DISTINCT id.\"productId\" FROM \"InvoiceDetail\" id) ORDER BY p.\"productName\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInvoiceDetail(invoiceId, productId, quantity, unitPrice)\nSaleInvoice(invoiceId, orderType, invoiceDate)",
+      "Question": "Chi phí vốn trung bình theo sản phẩm"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\", AVG(id.\"unitPrice\") AS GiaTrungBinh, COUNT(id.\"invoiceId\") AS SoLan FROM \"Product\" p JOIN \"InvoiceDetail\" id ON p.\"productId\" = id.\"productId\" JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" WHERE si.\"orderType\" = 'Xuathang' GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\" ORDER BY SoLan DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInventory(inventoryId, productId, quantity, stockId)\nStock(stockId, name)",
+      "Question": "Tồn kho theo chi nhánh/kho"
+    },
+    "output": "SELECT s.\"stockId\", s.\"name\", COUNT(DISTINCT p.\"productId\") AS SoMatHang, SUM(inv.\"quantity\") AS TongSoLuong, SUM(inv.\"quantity\" * p.\"cost\") AS GiaTriTon FROM \"Inventory\" inv JOIN \"Product\" p ON inv.\"productId\" = p.\"productId\" JOIN \"Stock\" s ON inv.\"stockId\" = s.\"stockId\" GROUP BY s.\"stockId\", s.\"name\" ORDER BY GiaTriTon DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInvoiceDetail(invoiceId, productId, quantity, unitPrice)",
+      "Question": "Sản phẩm bán lần đầu và lần cuối"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\", MIN(si.\"invoiceDate\") AS NgayBanDau, MAX(si.\"invoiceDate\") AS NgayBanCuoi, COUNT(*) AS SoLanBan FROM \"Product\" p JOIN \"InvoiceDetail\" id ON p.\"productId\" = id.\"productId\" JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\" ORDER BY SoLanBan DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nProductPrice(productPriceId, productId, price, startDate, endDate)",
+      "Question": "Lịch sử giá sản phẩm"
+    },
+    "output": "SELECT p.\"productCode\", p.\"productName\", pp.\"price\", pp.\"startDate\", pp.\"endDate\" FROM \"Product\" p LEFT JOIN \"ProductPrice\" pp ON p.\"productId\" = pp.\"productId\" WHERE p.\"productId\" = :param ORDER BY pp.\"startDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Thống kê sản phẩm theo danh mục"
+    },
+    "output": "SELECT c.\"categoryId\", c.\"categoryName\", COUNT(p.\"productId\") AS SoSanPham, AVG(p.\"cost\") AS GiaVonTB, MIN(p.\"cost\") AS GiaVonMin, MAX(p.\"cost\") AS GiaVonMax FROM \"ProductCategory\" c LEFT JOIN \"Product\" p ON c.\"categoryId\" = p.\"categoryId\" GROUP BY c.\"categoryId\", c.\"categoryName\" ORDER BY SoSanPham DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName, cost)\nInventory(inventoryId, productId, quantity)\nInvoiceDetail(invoiceId, productId, quantity, unitPrice)\nSaleInvoice(invoiceId, orderType)",
+      "Question": "Lợi nhuận ước tính từ tồn kho"
+    },
+    "output": "SELECT p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\", SUM(inv.\"quantity\") AS SoLuongTon, AVG(id.\"unitPrice\") AS GiaBanTB, SUM(inv.\"quantity\") * (AVG(id.\"unitPrice\") - p.\"cost\") AS LoiNhuanUocTinh FROM \"Product\" p LEFT JOIN \"Inventory\" inv ON p.\"productId\" = inv.\"productId\" LEFT JOIN \"InvoiceDetail\" id ON p.\"productId\" = id.\"productId\" LEFT JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" WHERE si.\"orderType\" = 'Xuathang' OR si.\"orderType\" IS NULL GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\", p.\"cost\" ORDER BY LoiNhuanUocTinh DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, orderType, totalAmount, discountAmount, paidAmount, customerId)\nInvoiceDetail(invoiceId, productId, quantity, total)\nProduct(productId, productName, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Top 10 mặt hàng bán chạy hôm nay"
+    },
+    "output": "SELECT p.\"productName\" AS tenSanPham, SUM(id.quantity) AS soLuongBan, SUM(id.total) AS tongDoanhThu FROM \"InvoiceDetail\" id JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" JOIN \"Product\" p ON id.\"productId\" = p.\"productId\" WHERE DATE(si.\"invoiceDate\" AT TIME ZONE 'Asia/Ho_Chi_Minh') = CURRENT_DATE AND CAST(si.\"orderType\" AS text) = 'Xuathang' GROUP BY p.\"productName\" ORDER BY tongDoanhThu DESC LIMIT 10;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, orderType, totalAmount, discountAmount, paidAmount, customerId)",
+      "Question": "Doanh thu hôm nay, thực thu hôm nay, số hóa đơn hôm nay"
+    },
+    "output": "SELECT COUNT(si.\"invoiceId\") AS soHoaDonHomNay, COALESCE(SUM(si.\"totalAmount\" - COALESCE(si.\"discountAmount\", 0)), 0) AS doanhThuHomNay, COALESCE(SUM(si.\"paidAmount\"), 0) AS thucThuHomNay FROM \"SaleInvoice\" si WHERE DATE(si.\"invoiceDate\" AT TIME ZONE 'Asia/Ho_Chi_Minh') = CURRENT_DATE AND CAST(si.\"orderType\" AS text) = 'Xuathang';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, orderType, totalAmount, paidAmount)\nInvoiceDetail(invoiceId, productId, quantity)\nProduct(productId, productName, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Số bình gas đã bán được hôm nay"
+    },
+    "output": "SELECT COALESCE(SUM(id.quantity), 0) AS soBinhGasDaBan FROM \"InvoiceDetail\" id JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" JOIN \"Product\" p ON id.\"productId\" = p.\"productId\" JOIN \"ProductCategory\" c ON p.\"categoryId\" = c.\"categoryId\" WHERE DATE(si.\"invoiceDate\" AT TIME ZONE 'Asia/Ho_Chi_Minh') = CURRENT_DATE AND CAST(si.\"orderType\" AS text) = 'Xuathang' AND c.\"categoryName\" ILIKE '%bình gas%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Lấy danh sách hàng hóa thuộc một nhóm hàng hóa cụ thể"
+    },
+    "output": "SELECT p.* FROM \"Product\" p JOIN \"ProductCategory\" c ON p.\"categoryId\" = c.\"categoryId\" WHERE c.\"categoryId\" = :categoryId ORDER BY p.\"productId\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode)\nInventory(inventoryId, productId, stockId, quantity)\nStock(stockId, name)",
+      "Question": "Lấy danh sách hàng hóa và số lượng tồn đang có trong một kho cụ thể"
+    },
+    "output": "SELECT p.*, i.quantity AS tonKho FROM \"Product\" p JOIN \"Inventory\" i ON p.\"productId\" = i.\"productId\" WHERE i.\"stockId\" = :stockId ORDER BY p.\"productId\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode)\nProductPrice(id, productId, priceListId, sellingPrice)\nPriceList(priceListId, priceListName)",
+      "Question": "Lấy danh sách hàng hóa và mức giá bán tương ứng được áp dụng trong một bảng giá cụ thể"
+    },
+    "output": "SELECT p.*, pp.\"sellingPrice\" AS giaBan FROM \"Product\" p JOIN \"ProductPrice\" pp ON p.\"productId\" = pp.\"productId\" WHERE pp.\"priceListId\" = :priceListId ORDER BY p.\"productId\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode, categoryId, cost, unit, note)",
+      "Question": "Tìm kiếm thông tin chi tiết của hàng hóa dựa theo mã hàng hóa"
+    },
+    "output": "SELECT * FROM \"Product\" WHERE \"productCode\" ILIKE '%' || 'giá trị' || '%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode, categoryId, cost, unit, note)",
+      "Question": "Tìm kiếm và lấy danh sách hàng hóa dựa theo tên hàng hóa"
+    },
+    "output": "SELECT * FROM \"Product\" WHERE \"productName\" ILIKE '%' || 'giá trị' || '%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode)\nStock(stockId, name)\nInventory(inventoryId, productId, stockId, quantity)",
+      "Question": "Lấy số lượng tồn kho của một hàng hóa cụ thể tại một kho hàng cụ thể"
+    },
+    "output": "SELECT i.quantity AS soLuongTon FROM \"Inventory\" i JOIN \"Product\" p ON i.\"productId\" = p.\"productId\" JOIN \"Stock\" s ON i.\"stockId\" = s.\"stockId\" WHERE (p.\"productName\" ILIKE 'giá trị' OR p.\"productCode\" ILIKE 'giá trị') AND s.name ILIKE :stockName LIMIT 1;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productName, productCode)\nPriceList(priceListId, priceListName)\nProductPrice(id, productId, priceListId, sellingPrice)",
+      "Question": "Lấy giá bán của một hàng hóa cụ thể được áp dụng trong một bảng giá cụ thể"
+    },
+    "output": "SELECT pp.\"sellingPrice\" AS giaBan FROM \"ProductPrice\" pp JOIN \"Product\" p ON pp.\"productId\" = p.\"productId\" JOIN \"PriceList\" pl ON pp.\"priceListId\" = pl.\"priceListId\" WHERE (p.\"productName\" ILIKE 'giá trị' OR p.\"productCode\" ILIKE 'giá trị') AND pl.\"priceListName\" ILIKE :priceListName LIMIT 1;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "CustomerType(customerTypeId, customerTypeName)\nCustomer(customerId, customerTypeId)\nSaleInvoice(invoiceId, customerId, invoiceDate, totalAmount, discountAmount)",
+      "Question": "Báo cáo doanh thu bán hàng theo từng nhóm khách hàng"
+    },
+    "output": "SELECT ct.\"customerTypeName\" AS \"nhomKhachHang\", COUNT(si.\"invoiceId\") AS \"soDonHang\", SUM(si.\"totalAmount\" - COALESCE(si.\"discountAmount\", 0)) AS \"tongDoanhThu\" FROM \"SaleInvoice\" si JOIN \"Customer\" c ON si.\"customerId\" = c.\"customerId\" JOIN \"CustomerType\" ct ON c.\"customerTypeId\" = ct.\"customerTypeId\" WHERE si.\"invoiceDate\" BETWEEN :fromDate AND :toDate GROUP BY ct.\"customerTypeId\", ct.\"customerTypeName\" ORDER BY \"tongDoanhThu\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "User(userId, userCode, fullName)\nSaleInvoice(invoiceId, userId, invoiceDate, totalAmount, discountAmount)",
+      "Question": "Báo cáo doanh số chi tiết theo từng nhân viên"
+    },
+    "output": "SELECT u.\"userCode\", u.\"fullName\" AS \"tenNhanVien\", COUNT(si.\"invoiceId\") AS \"soDonHangDaBan\", SUM(si.\"totalAmount\" - COALESCE(si.\"discountAmount\", 0)) AS \"tongDoanhSo\" FROM \"SaleInvoice\" si JOIN \"User\" u ON si.\"userId\" = u.\"userId\" WHERE si.\"invoiceDate\" BETWEEN :fromDate AND :toDate GROUP BY u.\"userId\", u.\"userCode\", u.\"fullName\" ORDER BY \"tongDoanhSo\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName)\nInventory(inventoryId, productId, stockId, quantity)\nStock(stockId, name)",
+      "Question": "Thẻ cảnh báo sản phẩm sắp hết hàng trong kho"
+    },
+    "output": "SELECT p.\"productCode\", p.\"productName\", s.\"name\" AS \"tenKho\", i.\"quantity\" AS \"soLuongTon\" FROM \"Inventory\" i JOIN \"Product\" p ON i.\"productId\" = p.\"productId\" JOIN \"Stock\" s ON i.\"stockId\" = s.\"stockId\" WHERE i.\"quantity\" < 10 ORDER BY i.\"quantity\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Product(productId, productCode, productName)\nInvoiceDetail(invoiceId, productId, quantity, total)\nSaleInvoice(invoiceId, invoiceDate)",
+      "Question": "Top 5 sản phẩm bán chạy nhất trong tháng"
+    },
+    "output": "SELECT p.\"productCode\", p.\"productName\", SUM(id.\"quantity\") AS \"tongSoLuongBan\", SUM(id.\"total\") AS \"tongDoanhThuSanPham\" FROM \"InvoiceDetail\" id JOIN \"Product\" p ON id.\"productId\" = p.\"productId\" JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" WHERE si.\"invoiceDate\" BETWEEN :fromDate AND :toDate GROUP BY p.\"productId\", p.\"productCode\", p.\"productName\" ORDER BY \"tongSoLuongBan\" DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, totalAmount, discountAmount)",
+      "Question": "Doanh thu theo từng ngày trong tháng"
+    },
+    "output": "SELECT DATE_TRUNC('day', \"invoiceDate\") AS \"ngay\", SUM(\"totalAmount\" - COALESCE(\"discountAmount\", 0)) AS \"doanhThu\" FROM \"SaleInvoice\" WHERE \"invoiceDate\" BETWEEN :fromDate AND :toDate GROUP BY DATE_TRUNC('day', \"invoiceDate\") ORDER BY \"ngay\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, customerId)",
+      "Question": "Tổng số đơn hàng bán ra và số lượng khách hàng mua trong khoảng thời gian"
+    },
+    "output": "SELECT COUNT(\"invoiceId\") AS \"tongSoDonHang\", COUNT(DISTINCT \"customerId\") AS \"tongSoKhachHangMua\" FROM \"SaleInvoice\" WHERE \"invoiceDate\" BETWEEN :fromDate AND :toDate;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "ImportInvoice(importInvoiceId, invoiceDate, totalAmount, discountAmount)",
+      "Question": "Tổng chi phí nhập hàng trong khoảng thời gian"
+    },
+    "output": "SELECT SUM(\"totalAmount\" - COALESCE(\"discountAmount\", 0)) AS \"tongChiPhiNhap\" FROM \"ImportInvoice\" WHERE \"invoiceDate\" BETWEEN :fromDate AND :toDate;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceDate, totalAmount, discountAmount)",
+      "Question": "Tổng doanh thu bán hàng trong khoảng thời gian"
+    },
+    "output": "SELECT SUM(\"totalAmount\" - COALESCE(\"discountAmount\", 0)) AS \"tongDoanhThu\" FROM \"SaleInvoice\" WHERE \"invoiceDate\" BETWEEN :fromDate AND :toDate;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, customerCode, fullName, phoneNumber)",
+      "Question": "Tìm kiếm khách hàng theo tên, mã hoặc số điện thoại"
+    },
+    "output": "SELECT * FROM public.\"Customer\" WHERE \"fullName\" ILIKE '%' || 'giá trị' || '%' OR \"customerCode\" ILIKE '%' || 'giá trị' || '%' OR \"phoneNumber\" LIKE '%' || 'giá trị' || '%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, fullName, customerGroupId)\nCustomerGroup(customerGroupid, groupName)",
+      "Question": "Lấy danh sách khách hàng kèm theo tên nhóm"
+    },
+    "output": "SELECT c.*, cg.\"groupName\" FROM public.\"Customer\" c LEFT JOIN public.\"CustomerGroup\" cg ON c.\"customerGroupId\" = cg.\"customerGroupid\" ORDER BY c.\"fullName\" ASC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, wardId)\nWard(wardId, wardName, areaId)\nArea(areaId, areaName)",
+      "Question": "Thống kê số lượng khách hàng theo khu vực"
+    },
+    "output": "SELECT a.\"areaName\", w.\"wardName\", COUNT(c.\"customerId\") AS \"soLuongKhach\" FROM public.\"Customer\" c JOIN public.\"Ward\" w ON c.\"wardId\" = w.\"wardId\" JOIN public.\"Area\" a ON w.\"areaId\" = a.\"areaId\" GROUP BY a.\"areaName\", w.\"wardName\" ORDER BY \"soLuongKhach\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, customerCode, fullName, phoneNumber, debt)",
+      "Question": "Danh sách khách hàng đang nợ nhiều nhất"
+    },
+    "output": "SELECT \"customerCode\", \"fullName\", \"phoneNumber\", \"debt\" FROM public.\"Customer\" WHERE \"debt\" > 0 ORDER BY \"debt\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, fullName)\nDebtReceipt(receiptId, receiptCode, debtDate, dueDate, status, customerId)",
+      "Question": "Tổng hợp nợ quá hạn"
+    },
+    "output": "SELECT c.\"fullName\", dr.\"receiptCode\", dr.\"debtDate\", dr.\"dueDate\", (CURRENT_DATE - dr.\"dueDate\") AS \"soNgayQuaHan\" FROM public.\"DebtReceipt\" dr JOIN public.\"Customer\" c ON dr.\"customerId\" = c.\"customerId\" WHERE dr.\"status\" != 'Đã trả nợ' AND dr.\"dueDate\" < CURRENT_DATE ORDER BY \"soNgayQuaHan\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, debt)",
+      "Question": "Tính tổng dư nợ của toàn bộ hệ thống"
+    },
+    "output": "SELECT SUM(COALESCE(\"debt\", 0)) AS \"tongNoPhaiThu\" FROM public.\"Customer\";"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, customerCode, fullName)\nSaleInvoice(invoiceId, customerId, totalAmount, orderType)",
+      "Question": "Top 10 khách hàng đem lại doanh thu cao nhất"
+    },
+    "output": "SELECT c.\"customerCode\", c.\"fullName\", SUM(si.\"totalAmount\") AS \"tongDoanhThu\" FROM public.\"Customer\" c JOIN public.\"SaleInvoice\" si ON c.\"customerId\" = si.\"customerId\" WHERE si.\"orderType\" = 'Xuathang' GROUP BY c.\"customerId\", c.\"customerCode\", c.\"fullName\" ORDER BY \"tongDoanhThu\" DESC LIMIT 10;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "CashReceipt(receiptId, receiptCode, receiptDate, receiptAmount, note, PaymentMethod, customerId)",
+      "Question": "Lịch sử thanh toán của một khách hàng cụ thể"
+    },
+    "output": "SELECT \"receiptCode\", \"receiptDate\", \"receiptAmount\", \"note\", \"PaymentMethod\" FROM public.\"CashReceipt\" WHERE \"customerId\" = :customerId ORDER BY \"receiptDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Customer(customerId, fullName, phoneNumber)\nSaleInvoice(invoiceId, customerId, invoiceDate)",
+      "Question": "Danh sách khách hàng chưa có đơn hàng nào trong 30 ngày qua"
+    },
+    "output": "SELECT \"fullName\", \"phoneNumber\", MAX(\"invoiceDate\") AS \"lanCuoiMuaHang\" FROM public.\"Customer\" c LEFT JOIN public.\"SaleInvoice\" si ON c.\"customerId\" = si.\"customerId\" GROUP BY c.\"customerId\", \"fullName\", \"phoneNumber\" HAVING MAX(\"invoiceDate\") < (NOW() - INTERVAL '30 days') OR MAX(\"invoiceDate\") IS NULL;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "GasBook(gasBookId, gasBookCode, fullName, points, cycle, debt)",
+      "Question": "Lấy thông tin Sổ Gas và điểm tích lũy của khách hàng"
+    },
+    "output": "SELECT \"gasBookCode\", \"fullName\", \"points\", \"cycle\" AS \"kyDoiGas\", \"debt\" FROM public.\"GasBook\" WHERE \"points\" > 0 ORDER BY \"points\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Employee(employeeId, employeeCode, fullName, phoneNumber, email, status)",
+      "Question": "Tìm kiếm nhân viên theo tên hoặc mã nhân viên"
+    },
+    "output": "SELECT * FROM \"Employee\" WHERE \"fullName\" ILIKE '%' || 'giá trị' || '%' OR \"employeeCode\" ILIKE '%' || 'giá trị' || '%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Employee(employeeId, fullName, positionId)\nPosition(positionId, name)",
+      "Question": "Lấy danh sách nhân viên thuộc bộ phận 'Sale'"
+    },
+    "output": "SELECT e.* FROM \"Employee\" e JOIN \"Position\" p ON e.\"positionId\" = p.\"positionId\" WHERE p.\"name\" ILIKE '%sale%' AND e.\"status\" = true;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Employee(employeeId, fullName, hireDate)",
+      "Question": "Danh sách nhân viên mới gia nhập trong tháng này"
+    },
+    "output": "SELECT \"employeeCode\", \"fullName\", \"hireDate\" FROM \"Employee\" WHERE DATE_TRUNC('month', \"hireDate\") = DATE_TRUNC('month', CURRENT_DATE);"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Employee(employeeId, fullName, status)",
+      "Question": "Đếm số lượng nhân viên đang hoạt động"
+    },
+    "output": "SELECT COUNT(*) AS \"soLuongNhanVien\" FROM \"Employee\" WHERE \"status\" = true;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Employee(employeeId, fullName, dateOfBirth)",
+      "Question": "Hôm nay có nhân viên nào sinh nhật không?"
+    },
+    "output": "SELECT \"fullName\", \"phoneNumber\" FROM \"Employee\" WHERE EXTRACT(MONTH FROM \"dateOfBirth\") = EXTRACT(MONTH FROM CURRENT_DATE) AND EXTRACT(DAY FROM \"dateOfBirth\") = EXTRACT(DAY FROM CURRENT_DATE);"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "Account(accountId, username, status, employeeId)\nEmployee(employeeId, fullName)",
+      "Question": "Kiểm tra tài khoản đăng nhập của nhân viên dựa theo tên"
+    },
+    "output": "SELECT e.\"fullName\", a.\"username\", a.\"status\" FROM \"Account\" a JOIN \"Employee\" e ON a.\"employeeId\" = e.\"employeeId\" WHERE e.\"fullName\" ILIKE '%' || 'giá trị' || '%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseCode, purchaseDate, totalAmount, orderType)",
+      "Question": "Tổng tiền nhập hàng trong ngày hôm nay"
+    },
+    "output": "SELECT SUM(\"totalAmount\") AS \"tongNhapHomNay\" FROM \"PurchaseOrder\" WHERE DATE(\"purchaseDate\" AT TIME ZONE 'Asia/Ho_Chi_Minh') = CURRENT_DATE AND \"orderType\" = 'Nhaphang';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseCode, supplierId, totalAmount)\nSupplier(supplierId, fullName)",
+      "Question": "Lấy danh sách phiếu nhập hàng của nhà cung cấp Gas Vạn Lộc"
+    },
+    "output": "SELECT po.* FROM \"PurchaseOrder\" po JOIN \"Supplier\" s ON po.\"supplierId\" = s.\"supplierId\" WHERE s.\"fullName\" ILIKE '%Vạn Lộc%' AND po.\"orderType\" = 'Nhaphang' ORDER BY po.\"purchaseDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseCode, totalAmount, paidAmount)",
+      "Question": "Danh sách các đơn nhập hàng chưa thanh toán xong (còn nợ NCC)"
+    },
+    "output": "SELECT \"purchaseCode\", \"totalAmount\", \"paidAmount\", (\"totalAmount\" - \"paidAmount\") AS \"conNo\" FROM \"PurchaseOrder\" WHERE \"totalAmount\" > \"paidAmount\" AND \"orderType\" = 'Nhaphang';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseCode, orderType)\nPurchaseDetail(purchaseId, productId, quantity, total)\nProduct(productId, productName)",
+      "Question": "Chi tiết các mặt hàng trong phiếu nhập mã 'DHN00019'"
+    },
+    "output": "SELECT p.\"productName\", pd.\"quantity\", pd.\"purchasePrice\", pd.\"total\" FROM \"PurchaseDetail\" pd JOIN \"Product\" p ON pd.\"productId\" = p.\"productId\" JOIN \"PurchaseOrder\" po ON pd.\"purchaseId\" = po.\"purchaseId\" WHERE po.\"purchaseCode\" = 'DHN00019';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "PurchaseOrder(purchaseId, purchaseDate, orderType)",
+      "Question": "Đếm số lượng đơn đặt hàng (Dathang) đang chờ nhập kho"
+    },
+    "output": "SELECT COUNT(*) FROM \"PurchaseOrder\" WHERE \"orderType\" = 'Dathang';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceCode, totalAmount, discountAmount, paidAmount, orderType)",
+      "Question": "Báo cáo thực thu (tiền mặt/QR) hôm nay"
+    },
+    "output": "SELECT SUM(\"paidAmount\") AS \"thucThuHomNay\" FROM \"SaleInvoice\" WHERE DATE(\"invoiceDate\" AT TIME ZONE 'Asia/Ho_Chi_Minh') = CURRENT_DATE AND \"orderType\" = 'Xuathang';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, employeeId, totalAmount)\nEmployee(employeeId, fullName)",
+      "Question": "Xếp hạng nhân viên theo doanh số bán hàng trong tháng này"
+    },
+    "output": "SELECT e.\"fullName\", SUM(si.\"totalAmount\") AS \"doanhSo\" FROM \"SaleInvoice\" si JOIN \"Employee\" e ON si.\"employeeId\" = e.\"employeeId\" WHERE DATE_TRUNC('month', si.\"invoiceDate\") = DATE_TRUNC('month', CURRENT_DATE) GROUP BY e.\"employeeId\", e.\"fullName\" ORDER BY \"doanhSo\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceCode, PaymentMethod)",
+      "Question": "Danh sách các đơn hàng thanh toán bằng chuyển khoản (QR_Code)"
+    },
+    "output": "SELECT \"invoiceCode\", \"totalAmount\", \"invoiceDate\" FROM \"SaleInvoice\" WHERE \"PaymentMethod\" = 'QR_Code' ORDER BY \"invoiceDate\" DESC;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, customerId)\nCustomer(customerId, fullName)\nInvoiceDetail(invoiceId, productId, quantity)\nProduct(productId, categoryId)\nProductCategory(categoryId, categoryName)",
+      "Question": "Khách hàng nào mua nhiều 'Bình gas' nhất?"
+    },
+    "output": "SELECT c.\"fullName\", SUM(id.\"quantity\") AS \"tongSoBinh\" FROM \"InvoiceDetail\" id JOIN \"SaleInvoice\" si ON id.\"invoiceId\" = si.\"invoiceId\" JOIN \"Customer\" c ON si.\"customerId\" = c.\"customerId\" JOIN \"Product\" p ON id.\"productId\" = p.\"productId\" JOIN \"ProductCategory\" pc ON p.\"categoryId\" = pc.\"categoryId\" WHERE pc.\"categoryName\" ILIKE '%Bình gas%' GROUP BY c.\"customerId\", c.\"fullName\" ORDER BY \"tongSoBinh\" DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "DebtReceipt(receiptId, receiptCode, gasBookId)\nGasBook(gasBookId, gasBookCode, fullName)",
+      "Question": "Tìm các phiếu nợ liên quan đến mã Sổ Gas 'SG0002'"
+    },
+    "output": "SELECT dr.* FROM \"DebtReceipt\" dr JOIN \"GasBook\" gb ON dr.\"gasBookId\" = gb.\"gasBookId\" WHERE gb.\"gasBookCode\" = 'SG0002';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "RewardMilestone(promotionId, promotionName)\nPromotionDetail(promotionId, productId, quantity)\nProduct(productId, productName)",
+      "Question": "Quà tặng kèm của chương trình 'Tết sẻ chia' là gì?"
+    },
+    "output": "SELECT p.\"productName\", pd.\"quantity\" FROM \"PromotionDetail\" pd JOIN \"Product\" p ON pd.\"productId\" = p.\"productId\" JOIN \"RewardMilestone\" rm ON pd.\"promotionId\" = rm.\"promotionId\" WHERE rm.\"promotionName\" ILIKE '%Tết sẻ chia%';"
+  },
+  {
+    "instruction": "Generate PostgreSQL query",
+    "input": {
+      "Schema": "SaleInvoice(invoiceId, invoiceCode, discountAmount)",
+      "Question": "Thống kê số tiền đã giảm giá cho khách hàng trong tháng này"
+    },
+    "output": "SELECT SUM(\"discountAmount\") AS \"tongGiamGia\" FROM \"SaleInvoice\" WHERE DATE_TRUNC('month', \"invoiceDate\") = DATE_TRUNC('month', CURRENT_DATE);"
+  }
+]

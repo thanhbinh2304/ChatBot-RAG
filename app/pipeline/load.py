@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
 EMBED_MODEL = "bge-m3"
 DB_URL = os.getenv("DATABASE_URL")
-INPUT_FILE = "/app/data/DuLieu_RAG_KichBan.json"
+INPUT_FILE = "/app/data/rag_input_processes_v2.json"
 TABLE_NAME = '"Data_Embedding"'
 
 # ── Khởi tạo kết nối ──────────────────────────────────────
