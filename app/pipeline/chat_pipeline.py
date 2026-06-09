@@ -132,11 +132,16 @@ Question: {query}
 ### Output:
 """
     
-    # Sử dụng system prompt cực ngặt nghèo để tránh giải thích
+    # Sử dụng system prompt ngặt nghèo và thêm vài ví dụ để model không chế ra tên cột sai
     response = ollama_client.chat(
         model=SQL_MODEL,
         messages=[
-            {"role": "system", "content": "Bạn là máy sinh mã SQL. CHỈ TRẢ VỀ CÂU LỆNH SQL DƯỚI DẠNG TEXT THUẦN, KHÔNG GIẢI THÍCH, KHÔNG DÙNG MARKDOWN BLOCK (```sql)."},
+            {"role": "system", "content": """Bạn là chuyên gia SQL. 
+Nhiệm vụ của bạn là sinh ra câu lệnh PostgreSQL CHUẨN XÁC dựa trên Schema được cung cấp.
+QUY TẮC QUAN TRỌNG:
+1. CHỈ sử dụng các cột CÓ SẴN trong Schema. KHÔNG ĐƯỢC TỰ BỊA RA TÊN CỘT (ví dụ: tuyệt đối KHÔNG dùng invoiceAmount, hãy dùng totalAmount hoặc paidAmount nếu có trong bảng SaleInvoice).
+2. CHỈ TRẢ VỀ DUY NHẤT CÂU LỆNH SQL DƯỚI DẠNG TEXT THUẦN, KHÔNG GIẢI THÍCH, KHÔNG DÙNG MARKDOWN BLOCK (```sql).
+3. Đảm bảo tên bảng và tên cột có phân biệt hoa thường phải được bọc trong ngoặc kép (VD: "SaleInvoice", "totalAmount")."""},
             {"role": "user", "content": prompt}
         ]
     )
@@ -212,26 +217,38 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
         docs = retrieve(user_query, top_n=3)
         context = "\n\n".join([doc['content'] for doc in docs])
         
-        rag_prompt = f"""Dựa vào thông tin sau để trả lời câu hỏi:
+        rag_user_prompt = f"""Dựa vào thông tin sau để trả lời câu hỏi:
 {context}
 
 Lịch sử chat:
 {format_history_for_prompt(history[-4:])}
 
-Câu hỏi: {user_query}
-Trả lời:"""
-        res = ollama_client.generate(model=GENERAL_MODEL, prompt=rag_prompt)
-        response_content = res['response'].strip()
+Câu hỏi: {user_query}"""
+        
+        res = ollama_client.chat(
+            model=GENERAL_MODEL,
+            messages=[
+                {"role": "system", "content": "Bạn là một trợ lý ảo tiếng Việt hữu ích. Nhiệm vụ của bạn là trả lời câu hỏi DỰA TRÊN ngữ cảnh được cung cấp. BẮT BUỘC trả lời 100% bằng TIẾNG VIỆT, tuyệt đối không sử dụng ngôn ngữ khác."},
+                {"role": "user", "content": rag_user_prompt}
+            ]
+        )
+        response_content = res['message']['content'].strip()
         
     else:
         # Chit chat
-        chitchat_prompt = f"""Lịch sử chat:
+        chitchat_user_prompt = f"""Lịch sử chat:
 {format_history_for_prompt(history[-4:])}
 
-Câu hỏi: {user_query}
-Trả lời thân thiện:"""
-        res = ollama_client.generate(model=GENERAL_MODEL, prompt=chitchat_prompt)
-        response_content = res['response'].strip()
+Câu hỏi: {user_query}"""
+        
+        res = ollama_client.chat(
+            model=GENERAL_MODEL,
+            messages=[
+                {"role": "system", "content": "Bạn là một trợ lý ảo giao tiếp thân thiện. BẮT BUỘC trả lời 100% bằng TIẾNG VIỆT, tuyệt đối không sử dụng ngôn ngữ khác. Câu trả lời cần ngắn gọn, lịch sự."},
+                {"role": "user", "content": chitchat_user_prompt}
+            ]
+        )
+        response_content = res['message']['content'].strip()
     
     # 4. Lưu vào memory
     add_message_to_memory(session_id, "user", user_query)
