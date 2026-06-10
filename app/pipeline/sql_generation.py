@@ -18,7 +18,7 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST")
 ollama_client = Client(host=OLLAMA_HOST)
 
 DB_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DB_URL)
+engine = create_engine(DB_URL, pool_pre_ping=True)
 
 GENERAL_MODEL = os.getenv("ROUTER_MODEL", "qwen2.5:3b") 
 SQL_MODEL = os.getenv("LLM_MODEL", "hf.co/leebindz/qwen_finetune:Q4_K_M") 
@@ -28,8 +28,8 @@ def generate_sql(query: str) -> str:
     Sử dụng model đã finetune để sinh ra SQL.
     Ép prompt để chỉ trả về SQL.
     """
-    # Sử dụng Schema Pruning để chỉ lấy các bảng liên quan nhất (top 5)
-    pruned_schema = get_pruned_schema(query, top_k=5)
+    # Sử dụng Schema Pruning để lấy các bảng liên quan nhất (top 15 để tránh thiếu bảng)
+    pruned_schema = get_pruned_schema(query, top_k=15)
     # Dựa vào format lúc bạn finetune (finetune_data.json)
     prompt = f"""Generate PostgreSQL query
 
@@ -72,7 +72,7 @@ def fix_sql(query: str, wrong_sql: str, error_msg: str) -> str:
     """
     Yêu cầu LLM sửa lại câu SQL bị lỗi (Reflexion).
     """
-    pruned_schema = get_pruned_schema(query, top_k=5)
+    pruned_schema = get_pruned_schema(query, top_k=15)
     
     prompt = f"""You are a PostgreSQL expert. The following SQL query failed with an error.
 Please fix the SQL query based on the database schema and the error message.
@@ -155,6 +155,23 @@ def generate_natural_answer(user_query: str, sql_data: str) -> str:
     """
     Cho LLM đọc cục dữ liệu JSON lấy từ Database và bảo nó trả lời câu hỏi của người dùng.
     """
+    try:
+        data = json.loads(sql_data)
+        if len(data) == 1 and len(data[0]) == 1:
+            key = list(data[0].keys())[0]
+            val = data[0][key]
+            # Format number nicely if it's numeric
+            try:
+                numeric_val = float(val)
+                if numeric_val.is_integer():
+                    return f"Kết quả tra cứu là: **{int(numeric_val):,}**."
+                else:
+                    return f"Kết quả tra cứu là: **{numeric_val:,.2f}**."
+            except (ValueError, TypeError):
+                return f"Kết quả tra cứu là: **{val}**."
+    except Exception:
+        pass
+
     try:
         rule_path = os.path.join(os.path.dirname(__file__), "../Rule/system_instruction.text")
         with open(rule_path, "r", encoding="utf-8") as f:

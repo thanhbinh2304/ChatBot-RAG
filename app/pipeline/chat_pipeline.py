@@ -50,19 +50,49 @@ def format_history_for_prompt(history: List[Dict[str, str]]) -> str:
 
 def classify_intent(query: str, history: List[Dict[str, str]]) -> str:
     """
-    Dùng General Model để phân loại câu hỏi của user (Router).
+    Dùng Hybrid Routing: Hard-rule (Regex/Keyword) + LLM (Router).
     Luật phân loại được lấy từ app/Rule/intent_rule.text
     """
-    history_str = format_history_for_prompt(history[-4:]) # Lấy 4 tin gần nhất làm ngữ cảnh
+    query_lower = query.lower()
     
+    # 1. HARD-RULE ROUTING (Fast Path)
+    # Lọc các từ khóa RAG rõ ràng (ưu tiên cao)
+    rag_keywords = ["quy trình", "hướng dẫn", "chính sách", "quy định", "tài liệu", "sop", "workflow", "cách làm", "cách thực hiện", "điều kiện"]
+    if any(k in query_lower for k in rag_keywords):
+        _logger.info("[Router] Matched RAG Keyword")
+        return "RAG"
+        
     # Đọc system prompt từ file Rule/intent_rule.text
     try:
         rule_path = os.path.join(os.path.dirname(__file__), "../Rule/intent_rule.text")
         with open(rule_path, "r", encoding="utf-8") as f:
             system_prompt_content = f.read().strip()
+            
+        # Parse danh sách từ khóa SQL từ file (những dòng bắt đầu bằng dấu *)
+        sql_keywords = []
+        for line in system_prompt_content.split('\n'):
+            line = line.strip()
+            if line.startswith('*') and len(line) < 40 and not line.endswith('?'):
+                # Extract keyword (e.g. "* danh sách khách hàng" -> "danh sách khách hàng")
+                kw = line[1:].strip().lower()
+                if kw:
+                    sql_keywords.append(kw)
+        
+        # Sắp xếp từ khóa dài lên trước để match chính xác cụm từ
+        sql_keywords.sort(key=len, reverse=True)
+        
+        for kw in sql_keywords:
+            if kw in query_lower:
+                _logger.info(f"[Router] Matched SQL Keyword: '{kw}'")
+                return "SQL"
+                
     except Exception as e:
+        _logger.error(f"[Router] Lỗi đọc rule: {e}")
         system_prompt_content = "Chỉ trả về 1 từ: SQL, RAG, hoặc CHAT."
 
+    # 2. LLM FALLBACK (Slow Path)
+    _logger.info("[Router] Falling back to LLM for classification")
+    history_str = format_history_for_prompt(history[-4:])
     system_prompt_content = f"{get_current_time_context()}\n{system_prompt_content}"
 
     user_prompt = f"""Lịch sử gần đây:
@@ -114,25 +144,17 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
         
     elif intent == "RAG":
         # Sử dụng hàm retrieve đã có từ retrieval.py
-        docs = retrieve(user_query, top_n=3)
-        context = "\n\n".join([doc['content'] for doc in docs])
+        docs = retrieve(user_query, top_n=1)
         
-        rag_user_prompt = f"""Dựa vào thông tin sau để trả lời câu hỏi:
-{context}
-
-Lịch sử chat:
-{format_history_for_prompt(history[-4:])}
-
-Câu hỏi: {user_query}"""
-        
-        res = ollama_client.chat(
-            model=GENERAL_MODEL,
-            messages=[
-                {"role": "system", "content": f"{get_current_time_context()}\nBạn là một trợ lý ảo tiếng Việt hữu ích. Nhiệm vụ của bạn là trả lời câu hỏi DỰA TRÊN ngữ cảnh được cung cấp. BẮT BUỘC trả lời 100% bằng TIẾNG VIỆT, tuyệt đối không sử dụng ngôn ngữ khác."},
-                {"role": "user", "content": rag_user_prompt}
-            ]
-        )
-        response_content = res['message']['content'].strip()
+        if not docs:
+            response_content = "Xin lỗi, tôi không tìm thấy tài liệu nào liên quan đến câu hỏi của bạn trong hệ thống nội bộ."
+        else:
+            doc = docs[0]
+            process_name = doc.get("process_name", "Quy trình")
+            content = doc.get("content", "")
+            
+            # Bỏ qua khâu đưa vào LLM để tránh lỗi model Qwen tự động dịch câu điều kiện sang tiếng Nga/Indo
+            response_content = f"Dựa theo tài liệu nội bộ, dưới đây là chi tiết **{process_name}**:\n\n{content}"
         
     else:
         # Chit chat
