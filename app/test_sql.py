@@ -1,8 +1,5 @@
-from app.pipeline.chat_pipeline import chat_pipeline
-import logging
+from app.pipeline.chat_pipeline import generate_sql
 
-logging.basicConfig(level=logging.INFO)
-
-query = "Tác nhân trong quy trình bán hàng khách lẻ là ai?"
-res = chat_pipeline("test-session", query)
-print(f"Chat pipeline output: {res}")
+query = "kiểm kho chi tiết theo ngày hôm qua"
+sql = generate_sql(query)
+print(f"Generated SQL: '{sql}'")

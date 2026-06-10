@@ -28,46 +28,33 @@ SQL_MODEL = os.getenv("LLM_MODEL", "hf.co/leebindz/qwen_finetune:Q4_K_M")
 CHAT_MEMORY: Dict[str, List[Dict[str, str]]] = {}
 
 # Giới hạn số lượng tin nhắn trong lịch sử (để tránh context quá dài)
-MAX_MEMORY_LENGTH = 10 
+MAX_MEMORY_LENGTH = 20 
 
-DB_SCHEMA = """Account(accountId, username, password, status, createdAt, updatedAt, roleId, deleteAt, employeeId)
-Area(areaId, areaName)
-Attribute(attributeId, attributeName)
-CashReceipt(receiptId, receiptDate, receiptAmount, note, customerId, createdBy, transactionTypeId, invoiceId, PaymentMethod, objectId, supplierId, receiptCode, createdDate, employeeId)
-Customer(customerId, gender, dateOfBirth, note, fullName, phoneNumber, email, wardId, customerGroupId, customerCode, address, debt)
-CustomerGroup(customerGroupid, groupName)
-Data_Embedding(id, process_id, process_name, metadata, content, embedding)
-DebtReceipt(receiptId, debtDate, dueDate, note, receiptCode, status, customerId, gasBookId)
-DebtReceiptDetail(id, price, priceList, quantity, receiptId, productId)
-Employee(employeeId, employeeCode, positionId, note, status, hireDate, createdAt, updatedAt, gender, dateOfBirth, phoneNumber, fullName, email, wardId)
-GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode)
-Inventory(stockId, productId, quantity, inventoryId)
-InvoiceDetail(id, quantity, total, unitPrice, invoiceId, productId)
-Object(objectId, fullName, phoneNumber, address, wardId, email, gender, dateOfBirth)
-PasswordChangeVerification(verificationId, accountId, createdAt, employeeEmail, expiresAt, updatedAt, usedAt, username, verificationCodeHash)
-PasswordResetRequest(requestId, accountId, approvalToken, createdAt, employeeEmail, processedAt, status, updatedAt, username, CONSTRAINT)
-Payment(paymentId, paymentDate, paymentAmount, notes, objectId, createdBy, transactionTypeId, purchaseId, stockId, paymentMethod, supplierId, customerId, employeeId, paymentCode)
-Position(positionId, name)
-PriceList(priceListId, priceListName)
-Product(productId, productName, unit, cost, categoryId, note, productCode)
-ProductAttribute(productId, attributeId, attributeValue, id)
-ProductCategory(categoryId, categoryName)
-ProductPrice(productId, priceListId, sellingPrice, id)
-PromotionDetail(id, quantity, productId, promotionId, rewardMilestoneId)
-PurchaseDetail(purchaseId, productId, quantity, purchasePrice, total, id)
-PurchaseOrder(purchaseId, purchaseDate, totalAmount, employeeId, supplierId, note, orderType, stockId, discountAmount, paidAmount, purchaseCode)
-RewardMilestone(promotionId, rewardQuantity, rewardName, promotionName, startDate, endDate, leastValue, value, percentage, notes, promotionCode)
-Role(roleId, roleName, description, createdAt, updatedAt, deletedAt)
-SaleInvoice(invoiceId, invoiceDate, totalAmount, discountAmount, paidAmount, note, employeeId, customerId, gasBookId, stockId, orderType, invoiceCode, PaymentMethod)
-Stock(name, wardId, stockId)
-StockTake(stockTakeId, stockTakeDate, note, employeeId, stockId, stockTakeCode)
-StockTakeDetail(stockTakeId, productId, systymQuantity, actualQuantity, id)
-StockTransfer(transferId, transferDate, fromStockId, toStockId, employeeId, note, transferCode)
-StockTransferDetail(transferId, productId, quantity, id)
-Supplier(supplierId, taxNumber, note, fullName, phoneNumber, email, wardId, createdAt, updatedAt, address, debt)
-Token(tokenId, accountId, refreshToken, expiresAt, createdAt, updatedAt)
-TransactionType(transactionTypeId, transactionTypeName)
-Ward(wardId, wardName, areaId)"""
+DB_SCHEMA = """-- BẢNG DỮ LIỆU CỦA HỆ THỐNG GAS TUẤN ĐẠT --
+Account(accountId, username, password, status, createdAt, updatedAt, roleId, deleteAt, employeeId) -- Tài khoản người dùng
+Area(areaId, areaName) -- Khu vực
+CashReceipt(receiptId, receiptDate, receiptAmount, note, customerId, createdBy, transactionTypeId, invoiceId, PaymentMethod, objectId, supplierId, receiptCode, createdDate, employeeId) -- Phiếu thu tiền (Tiền vào)
+Customer(customerId, gender, dateOfBirth, note, fullName, phoneNumber, email, wardId, customerGroupId, customerCode, address, debt) -- Khách hàng
+CustomerGroup(customerGroupId, groupName) -- Loại khách hàng
+Employee(employeeId, employeeCode, positionId, note, status, hireDate, createdAt, updatedAt, gender, dateOfBirth, phoneNumber, fullName, email, wardId) -- Nhân viên
+GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId, cycle, customerGroupid, address, debt, gasBookCode) -- Sổ Gas của khách hàng
+Inventory(stockId, productId, quantity, inventoryId) -- Tồn kho hàng hóa
+InvoiceDetail(id, quantity, total, unitPrice, invoiceId, productId) -- Chi tiết các mặt hàng trong Hóa đơn bán (SaleInvoice)
+Payment(paymentId, paymentDate, paymentAmount, notes, objectId, createdBy, transactionTypeId, purchaseId, stockId, paymentMethod, supplierId, customerId, employeeId, paymentCode) -- Phiếu chi tiền (Tiền ra)
+Position(positionId, name) -- Chức vụ nhân viên
+PriceList(priceListId, priceListName) -- Bảng giá
+Product(productId, productName, unit, cost, categoryId, note, productCode) -- Thông tin sản phẩm / hàng hóa
+ProductCategory(categoryId, categoryName) -- Danh mục sản phẩm
+PurchaseDetail(purchaseId, productId, quantity, purchasePrice, total, id) -- Chi tiết các mặt hàng trong phiếu nhập
+PurchaseOrder(purchaseId, purchaseDate, totalAmount, employeeId, supplierId, note, orderType, stockId, discountAmount, paidAmount, purchaseCode) -- Phiếu nhập hàng / Mua hàng từ nhà cung cấp
+SaleInvoice(invoiceId, invoiceDate, totalAmount, discountAmount, paidAmount, note, employeeId, customerId, gasBookId, stockId, orderType, invoiceCode, PaymentMethod) -- Hóa đơn bán hàng / Doanh thu bán hàng
+Stock(name, wardId, stockId) -- Cửa hàng / Kho chứa
+StockTake(stockTakeId, stockTakeDate, note, employeeId, stockId, stockTakeCode) -- Phiếu kiểm kho
+StockTakeDetail(stockTakeId, productId, systymQuantity, actualQuantity, id) -- Chi tiết kiểm kho
+StockTransfer(transferId, transferDate, fromStockId, toStockId, employeeId, note, transferCode) -- Phiếu chuyển kho
+StockTransferDetail(transferId, productId, quantity, id) -- Chi tiết chuyển kho
+Supplier(supplierId, taxNumber, note, fullName, phoneNumber, email, wardId, createdAt, updatedAt, address, debt) -- Nhà cung cấp
+Ward(wardId, wardName, areaId) -- Phường/Xã"""
 
 
 def get_chat_history(session_id: str) -> List[Dict[str, str]]:
@@ -90,28 +77,35 @@ def format_history_for_prompt(history: List[Dict[str, str]]) -> str:
 
 def classify_intent(query: str, history: List[Dict[str, str]]) -> str:
     """
-    Dùng General Model để phân loại câu hỏi của user:
-    - Trả về "SQL" nếu câu hỏi liên quan đến tra cứu dữ liệu số liệu (doanh thu, khách hàng, hàng hóa, v.v.)
-    - Trả về "RAG" nếu câu hỏi liên quan đến quy trình, hướng dẫn, chính sách.
-    - Trả về "CHAT" nếu là câu giao tiếp bình thường.
+    Dùng General Model để phân loại câu hỏi của user (Router).
+    Luật phân loại được lấy từ app/Rule/intent_rule.text
     """
     history_str = format_history_for_prompt(history[-4:]) # Lấy 4 tin gần nhất làm ngữ cảnh
     
-    prompt = f"""Bạn là một hệ thống phân loại câu hỏi (Router). Nhiệm vụ của bạn là đọc câu hỏi của người dùng và lịch sử chat, sau đó phân loại câu hỏi vào 1 trong 3 nhóm sau:
-1. SQL: Câu hỏi tra cứu dữ liệu, thống kê, số liệu từ cơ sở dữ liệu (ví dụ: doanh thu hôm nay, khách hàng nợ nhiều nhất, số lượng tồn kho...).
-2. RAG: Câu hỏi về quy trình, hướng dẫn sử dụng, chính sách (ví dụ: làm sao để xuất hàng, quy trình đổi gas...).
-3. CHAT: Câu hỏi giao tiếp thông thường (chào hỏi, cảm ơn...).
+    # Đọc system prompt từ file Rule/intent_rule.text
+    try:
+        rule_path = os.path.join(os.path.dirname(__file__), "../Rule/intent_rule.text")
+        with open(rule_path, "r", encoding="utf-8") as f:
+            system_prompt_content = f.read().strip()
+    except Exception as e:
+        system_prompt_content = "Chỉ trả về 1 từ: SQL, RAG, hoặc CHAT."
 
-Chỉ trả về 1 từ duy nhất: "SQL", "RAG", hoặc "CHAT". Không giải thích.
-
-Lịch sử gần đây:
+    user_prompt = f"""Lịch sử gần đây:
 {history_str}
 
 Câu hỏi hiện tại: {query}
 Phân loại:"""
 
-    response = ollama_client.generate(model=GENERAL_MODEL, prompt=prompt)
-    intent = response['response'].strip().upper()
+    response = ollama_client.chat(
+        model=GENERAL_MODEL,
+        messages=[
+            {"role": "system", "content": system_prompt_content},
+            {"role": "user", "content": user_prompt}
+        ],
+        options={"temperature": 0.0}
+    )
+    
+    intent = response['message']['content'].strip().upper()
     
     if "SQL" in intent: return "SQL"
     elif "RAG" in intent: return "RAG"
@@ -132,18 +126,21 @@ Question: {query}
 ### Output:
 """
     
-    # Sử dụng system prompt ngặt nghèo và thêm vài ví dụ để model không chế ra tên cột sai
+    # Đọc system prompt từ file Rule/system_rule.text
+    try:
+        rule_path = os.path.join(os.path.dirname(__file__), "../Rule/system_rule.text")
+        with open(rule_path, "r", encoding="utf-8") as f:
+            system_prompt_content = f.read().strip()
+    except Exception as e:
+        system_prompt_content = "Bạn là chuyên gia SQL. Chỉ sinh SQL."
+
     response = ollama_client.chat(
         model=SQL_MODEL,
         messages=[
-            {"role": "system", "content": """Bạn là chuyên gia SQL. 
-Nhiệm vụ của bạn là sinh ra câu lệnh PostgreSQL CHUẨN XÁC dựa trên Schema được cung cấp.
-QUY TẮC QUAN TRỌNG:
-1. CHỈ sử dụng các cột CÓ SẴN trong Schema. KHÔNG ĐƯỢC TỰ BỊA RA TÊN CỘT (ví dụ: tuyệt đối KHÔNG dùng invoiceAmount, hãy dùng totalAmount hoặc paidAmount nếu có trong bảng SaleInvoice).
-2. CHỈ TRẢ VỀ DUY NHẤT CÂU LỆNH SQL DƯỚI DẠNG TEXT THUẦN, KHÔNG GIẢI THÍCH, KHÔNG DÙNG MARKDOWN BLOCK (```sql).
-3. Đảm bảo tên bảng và tên cột có phân biệt hoa thường phải được bọc trong ngoặc kép (VD: "SaleInvoice", "totalAmount")."""},
+            {"role": "system", "content": system_prompt_content},
             {"role": "user", "content": prompt}
-        ]
+        ],
+        options={"temperature": 0.0}
     )
     
     sql_query = response['message']['content'].strip()
@@ -174,16 +171,29 @@ def generate_natural_answer(user_query: str, sql_data: str) -> str:
     """
     Cho LLM đọc cục dữ liệu JSON lấy từ Database và bảo nó trả lời câu hỏi của người dùng.
     """
-    prompt = f"""Dưới đây là kết quả trích xuất từ cơ sở dữ liệu (định dạng JSON):
+    # Đọc system prompt từ file Rule/system_instruction.text
+    try:
+        rule_path = os.path.join(os.path.dirname(__file__), "../Rule/system_instruction.text")
+        with open(rule_path, "r", encoding="utf-8") as f:
+            system_instruction = f.read().strip()
+    except Exception as e:
+        system_instruction = "Bạn là chuyên gia phân tích dữ liệu. Hãy trả lời câu hỏi dựa trên JSON."
+
+    user_prompt = f"""Dưới đây là kết quả trích xuất từ cơ sở dữ liệu (định dạng JSON):
 {sql_data}
 
-Dựa vào dữ liệu trên, hãy trả lời câu hỏi của người dùng một cách tự nhiên, ngắn gọn và thân thiện nhất (bằng tiếng Việt). Nếu dữ liệu bị lỗi hoặc rỗng, hãy báo cho người dùng biết.
+Dựa vào dữ liệu trên, hãy trả lời câu hỏi sau:
+Câu hỏi: {user_query}"""
 
-Câu hỏi: {user_query}
-Trả lời:"""
-    
-    response = ollama_client.generate(model=GENERAL_MODEL, prompt=prompt)
-    return response['response'].strip()
+    response = ollama_client.chat(
+        model=GENERAL_MODEL,
+        messages=[
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_prompt}
+        ],
+        options={"temperature": 0.0}
+    )
+    return response['message']['content'].strip()
 
 def chat_pipeline(session_id: str, user_query: str) -> dict:
     _logger.info(f"[Chat] Session {session_id} - Query: {user_query}")
