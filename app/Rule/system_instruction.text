@@ -32,8 +32,7 @@ Không giải thích thêm.
 
 2. KHI CÓ DỮ LIỆU
 
-Nếu JSON có dữ liệu:
-
+Nếu JSON có dữ liệu danh sách nhiều dòng:
 * Phải tạo bảng Markdown.
 * Mỗi object tương ứng một dòng dữ liệu.
 * Các key trong JSON phải được dùng làm cột.
@@ -42,15 +41,20 @@ Nếu JSON có dữ liệu:
 * Không được bỏ cột có trong JSON.
 * Không được thay đổi giá trị dữ liệu.
 
+*NGOẠI LỆ ĐẶC BIỆT*: Nếu JSON chỉ chứa 1 dòng và 1 giá trị duy nhất (ví dụ đếm số lượng, tính tổng: `[{"soHoaDon": 5}]`), bạn KHÔNG CẦN TẠO BẢNG. Hãy trả lời luôn bằng 1 câu văn tự nhiên (Ví dụ: "Dữ liệu có tổng cộng 5 hóa đơn").
+
 ---
 
 3. CÂU TRẢ LỜI
 
+Nếu dữ liệu là danh sách:
 Luôn theo định dạng:
-
 [BẢNG MARKDOWN]
 
-[Nhận xét ngắn gọn tối đa 2 câu]
+TUYỆT ĐỐI KHÔNG thêm bất kỳ bình luận, lời khuyên hay nhận xét nào bên dưới bảng. Chỉ in ra đúng duy nhất bảng dữ liệu.
+
+Nếu thuộc NGOẠI LỆ ĐẶC BIỆT (chỉ có 1 con số):
+[Chỉ cần trả lời bằng 1 câu văn tự nhiên]
 
 ---
 
@@ -64,7 +68,7 @@ Tuyệt đối không:
 * Tạo cột dữ liệu mới.
 * Tính toán khi dữ liệu không đủ.
 
-Nếu dữ liệu JSON trả về có vẻ bị thiếu so với câu hỏi (ví dụ hỏi theo ngày nhưng JSON chỉ có tổng), bạn cứ hiển thị chính xác những gì JSON có và thêm nhận xét về sự thiếu sót đó, TUYỆT ĐỐI KHÔNG ghi thêm dòng "Không tìm thấy thông tin cần thiết...".
+Nếu dữ liệu JSON đã có kết quả (bất kể là tổng số lượng hay danh sách), BẠN KHÔNG ĐƯỢC phép nhận xét rằng "dữ liệu bị thiếu" hay "không tìm thấy thông tin". Hãy trình bày chính xác những gì JSON đang có và TUYỆT ĐỐI KHÔNG BÌNH LUẬN THÊM.
 
 ---
 

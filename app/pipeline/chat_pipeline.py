@@ -144,35 +144,17 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
         
     elif intent == "RAG":
         # Sử dụng hàm retrieve đã có từ retrieval.py
-        docs = retrieve(user_query, top_n=3)
-        context = "\n\n".join([doc['content'] for doc in docs])
+        docs = retrieve(user_query, top_n=1)
         
-        rag_user_prompt = f"""Dựa vào tài liệu sau, hãy trích xuất và copy-paste y nguyên nội dung để trả lời (KHÔNG ĐƯỢC TỰ DỊCH HAY ĐỔI CHỮ):
-{context}
-
-Lịch sử chat:
-{format_history_for_prompt(history[-4:])}
-
-Câu hỏi: {user_query}
-Trả lời bằng Tiếng Việt (Giữ nguyên câu chữ của tài liệu):"""
-        
-        try:
-            rag_rule_path = os.path.join(os.path.dirname(__file__), "../Rule/rag_instruction.text")
-            with open(rag_rule_path, "r", encoding="utf-8") as f:
-                rag_system_prompt = f.read().strip()
-        except Exception as e:
-            _logger.error(f"[RAG] Lỗi đọc rule: {e}")
-            rag_system_prompt = "Bạn là trợ lý RAG. Trả lời câu hỏi ngắn gọn dựa trên ngữ cảnh."
-
-        res = ollama_client.chat(
-            model=GENERAL_MODEL,
-            messages=[
-                {"role": "system", "content": f"{get_current_time_context()}\n{rag_system_prompt}"},
-                {"role": "user", "content": rag_user_prompt}
-            ],
-            options={"temperature": 0.0}
-        )
-        response_content = res['message']['content'].strip()
+        if not docs:
+            response_content = "Xin lỗi, tôi không tìm thấy tài liệu nào liên quan đến câu hỏi của bạn trong hệ thống nội bộ."
+        else:
+            doc = docs[0]
+            process_name = doc.get("process_name", "Quy trình")
+            content = doc.get("content", "")
+            
+            # Bỏ qua khâu đưa vào LLM để tránh lỗi model Qwen tự động dịch câu điều kiện sang tiếng Nga/Indo
+            response_content = f"Dựa theo tài liệu nội bộ, dưới đây là chi tiết **{process_name}**:\n\n{content}"
         
     else:
         # Chit chat
