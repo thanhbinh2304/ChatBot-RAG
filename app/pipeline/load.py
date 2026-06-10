@@ -7,6 +7,10 @@ from ollama import Client
 
 
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
@@ -17,11 +21,11 @@ _logger = logging.getLogger(__name__)
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
 EMBED_MODEL = "bge-m3"
 DB_URL = os.getenv("DATABASE_URL")
-INPUT_FILE = "/app/data/rag_input_processes_v2.json"
+INPUT_FILE = os.path.join(os.path.dirname(__file__), "../../data/rag_input_processes_v2.json")
 TABLE_NAME = '"Data_Embedding"'
 
 # ── Khởi tạo kết nối ──────────────────────────────────────
-engine = create_engine(DB_URL)
+engine = create_engine(DB_URL, pool_pre_ping=True)
 ollama_client = Client(host=OLLAMA_HOST)
 
 

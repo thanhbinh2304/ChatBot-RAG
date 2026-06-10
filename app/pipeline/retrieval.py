@@ -26,7 +26,7 @@ BM25_TOP_K   = 20   # lấy bao nhiêu kết quả từ BM25
 FINAL_TOP_N  = 5    # trả về bao nhiêu kết quả cuối sau reranking
 
 # ── Khởi tạo ──────────────────────────────────────────────────
-engine        = create_engine(DB_URL)
+engine        = create_engine(DB_URL, pool_pre_ping=True)
 ollama_client = Client(host=OLLAMA_HOST)
 # CrossEncoder load lười — chỉ khởi tạo khi cần, tránh tốn RAM lúc startup
 _cross_encoder: CrossEncoder | None = None
@@ -196,6 +196,10 @@ def rerank(query: str, candidates: list[dict], top_n: int = FINAL_TOP_N) -> list
 
     results = []
     for score, doc in scored[:top_n]:
+        if score < 0.3:
+            _logger.info(f"[Reranking] Bỏ qua '{doc.get('process_name')}' do điểm quá thấp ({score:.4f})")
+            continue
+            
         doc_copy = dict(doc)
         doc_copy["rerank_score"] = float(score)
         results.append(doc_copy)

@@ -1,0 +1,122 @@
+[
+    {
+        "id": 1,
+        "level": "Easy",
+        "question": "Liệt kê danh sách tất cả các khách hàng có trong hệ thống gồm họ tên và số điện thoại.",
+        "ground_truth": "SELECT \"fullName\", \"phoneNumber\" FROM public.\"Customer\";"
+    },
+    {
+        "id": 2,
+        "level": "Easy",
+        "question": "Tìm tất cả các sản phẩm có giá vốn (cost) lớn hơn 200,000 VND.",
+        "ground_truth": "SELECT \"productCode\", \"productName\", \"cost\" FROM public.\"Product\" WHERE \"cost\" > 200000;"
+    },
+    {
+        "id": 3,
+        "level": "Easy",
+        "question": "Đếm tổng số lượng nhân viên hiện có của công ty.",
+        "ground_truth": "SELECT COUNT(*) FROM public.\"Employee\";"
+    },
+    {
+        "id": 4,
+        "level": "Easy",
+        "question": "Hiển thị danh sách các nhân viên đang ở trạng thái hoạt động (status = true).",
+        "ground_truth": "SELECT \"employeeCode\", \"fullName\", \"email\" FROM public.\"Employee\" WHERE status = true;"
+    },
+    {
+        "id": 5,
+        "level": "Easy",
+        "question": "Tìm thông tin các nhà cung cấp có dư nợ (debt) lớn hơn 0.",
+        "ground_truth": "SELECT \"fullName\", \"phoneNumber\", \"debt\" FROM public.\"Supplier\" WHERE debt > 0;"
+    },
+    {
+        "id": 6,
+        "level": "Easy",
+        "question": "Lấy danh sách mã danh mục và tên danh mục của tất cả sản phẩm.",
+        "ground_truth": "SELECT \"categoryId\", \"categoryName\" FROM public.\"ProductCategory\";"
+    },
+    {
+        "id": 7,
+        "level": "Easy",
+        "question": "Tìm thông tin chi tiết của hóa đơn bán hàng có mã là 'HD0001'.",
+        "ground_truth": "SELECT * FROM public.\"SaleInvoice\" WHERE \"invoiceCode\" = 'HD0001';"
+    },
+    {
+        "id": 8,
+        "level": "Easy",
+        "question": "Hiển thị danh sách tất cả các kho hàng hiện có của công ty.",
+        "ground_truth": "SELECT \"stockId\", name FROM public.\"Stock\";"
+    },
+    {
+        "id": 9,
+        "level": "Easy",
+        "question": "Tìm danh sách các khách hàng có số tiền nợ (debt) vượt quá 5,000,000 VND.",
+        "ground_truth": "SELECT \"customerCode\", \"fullName\", debt FROM public.\"Customer\" WHERE debt > 5000000;"
+    },
+    {
+        "id": 10,
+        "level": "Easy",
+        "question": "Liệt kê các đơn mua hàng (PurchaseOrder) có tổng tiền (totalAmount) lớn hơn 50,000,000 VND.",
+        "ground_truth": "SELECT \"purchaseCode\", \"purchaseDate\", \"totalAmount\" FROM public.\"PurchaseOrder\" WHERE \"totalAmount\" > 50000000;"
+    },
+    {
+        "id": 11,
+        "level": "Hard",
+        "question": "Tính doanh số bán hàng (tổng số lượng sản phẩm và tổng số tiền thu được) theo từng danh mục sản phẩm.",
+        "ground_truth": "SELECT pc.\"categoryName\", SUM(id.\"quantity\") AS \"totalQuantity\", SUM(id.\"total\") AS \"totalRevenue\" FROM public.\"ProductCategory\" pc JOIN public.\"Product\" p ON pc.\"categoryId\" = p.\"categoryId\" JOIN public.\"InvoiceDetail\" id ON p.\"productId\" = id.\"productId\" GROUP BY pc.\"categoryName\";"
+    },
+    {
+        "id": 12,
+        "level": "Hard",
+        "question": "Tìm top 5 khách hàng có tổng giá trị mua hàng cao nhất trong năm 2026.",
+        "ground_truth": "SELECT c.\"customerCode\", c.\"fullName\", SUM(si.\"totalAmount\") AS \"totalPurchased\" FROM public.\"Customer\" c JOIN public.\"SaleInvoice\" si ON c.\"customerId\" = si.\"customerId\" WHERE si.\"invoiceDate\" >= '2026-01-01' AND si.\"invoiceDate\" < '2027-01-01' GROUP BY c.\"customerCode\", c.\"fullName\" ORDER BY \"totalPurchased\" DESC LIMIT 5;"
+    },
+    {
+        "id": 13,
+        "level": "Hard",
+        "question": "Liệt kê chi tiết các sản phẩm đã nhập kho từ nhà cung cấp 'Công ty Gas Tuấn Đạt', gồm mã đơn mua, tên sản phẩm, số lượng và tổng tiền nhập.",
+        "ground_truth": "SELECT po.\"purchaseCode\", p.\"productName\", pd.\"quantity\", pd.\"total\" FROM public.\"Supplier\" s JOIN public.\"PurchaseOrder\" po ON s.\"supplierId\" = po.\"supplierId\" JOIN public.\"PurchaseDetail\" pd ON po.\"purchaseId\" = pd.\"purchaseId\" JOIN public.\"Product\" p ON pd.\"productId\" = p.\"productId\" WHERE s.\"fullName\" = 'Công ty Gas Tuấn Đạt';"
+    },
+    {
+        "id": 14,
+        "level": "Hard",
+        "question": "Cho biết danh sách toàn bộ nhân viên cùng tên chức vụ của họ và tổng số lượng hóa đơn bán hàng mà mỗi nhân viên đã lập.",
+        "ground_truth": "SELECT e.\"employeeCode\", e.\"fullName\", pos.name AS \"positionName\", COUNT(si.\"invoiceId\") AS \"invoiceCount\" FROM public.\"Employee\" e JOIN public.\"Position\" pos ON e.\"positionId\" = pos.\"positionId\" LEFT JOIN public.\"SaleInvoice\" si ON e.\"employeeId\" = si.\"employeeId\" GROUP BY e.\"employeeCode\", e.\"fullName\", pos.name;"
+    },
+    {
+        "id": 15,
+        "level": "Hard",
+        "question": "Tìm tất cả các sản phẩm hiện tại chưa từng được bán ra trong bất kỳ hóa đơn bán hàng nào.",
+        "ground_truth": "SELECT p.\"productCode\", p.\"productName\" FROM public.\"Product\" p LEFT JOIN public.\"InvoiceDetail\" id ON p.\"productId\" = id.\"productId\" WHERE id.\"productId\" IS NULL;"
+    },
+    {
+        "id": 16,
+        "level": "Hard",
+        "question": "Thống kê tổng doanh thu bán hàng thu được theo từng vùng địa lý (tên khu vực - Area và tên phường/xã - Ward) của khách hàng.",
+        "ground_truth": "SELECT a.\"areaName\", w.\"wardName\", SUM(si.\"totalAmount\") AS \"totalSales\" FROM public.\"Area\" a JOIN public.\"Ward\" w ON a.\"areaId\" = w.\"areaId\" JOIN public.\"Customer\" c ON w.\"wardId\" = c.\"wardId\" JOIN public.\"SaleInvoice\" si ON c.\"customerId\" = si.\"customerId\" GROUP BY a.\"areaName\", w.\"wardName\";"
+    },
+    {
+        "id": 17,
+        "level": "Hard",
+        "question": "Hiển thị danh sách các sản phẩm đang có số lượng tồn kho dưới 10 tại mỗi kho hàng, bao gồm tên kho, tên sản phẩm và số lượng tồn hiện tại.",
+        "ground_truth": "SELECT s.name AS \"stockName\", p.\"productName\", i.quantity AS \"stockQuantity\" FROM public.\"Stock\" s JOIN public.\"Inventory\" i ON s.\"stockId\" = i.\"stockId\" JOIN public.\"Product\" p ON i.\"productId\" = p.\"productId\" WHERE i.quantity < 10;"
+    },
+    {
+        "id": 18,
+        "level": "Hard",
+        "question": "Liệt kê các hóa đơn bán hàng có áp dụng giảm giá (discountAmount > 0) cho những khách hàng thuộc nhóm 'Khách VIP'.",
+        "ground_truth": "SELECT si.\"invoiceCode\", c.\"fullName\", si.\"discountAmount\" FROM public.\"SaleInvoice\" si JOIN public.\"Customer\" c ON si.\"customerId\" = c.\"customerId\" JOIN public.\"CustomerGroup\" cg ON c.\"customerGroupId\" = cg.\"customerGroupid\" WHERE si.\"discountAmount\" > 0 AND cg.\"groupName\" = 'Khách VIP';"
+    },
+    {
+        "id": 19,
+        "level": "Hard",
+        "question": "Tìm nhân viên đã lập được hóa đơn bán hàng có giá trị cao nhất trong hệ thống, hiển thị mã nhân viên, họ tên, chức vụ và giá trị hóa đơn đó.",
+        "ground_truth": "SELECT e.\"employeeCode\", e.\"fullName\", pos.name AS \"positionName\", si.\"invoiceCode\", si.\"totalAmount\" FROM public.\"Employee\" e JOIN public.\"Position\" pos ON e.\"positionId\" = pos.\"positionId\" JOIN public.\"SaleInvoice\" si ON e.\"employeeId\" = si.\"employeeId\" WHERE si.\"totalAmount\" = (SELECT MAX(\"totalAmount\") FROM public.\"SaleInvoice\");"
+    },
+    {
+        "id": 20,
+        "level": "Hard",
+        "question": "Thống kê tổng số lượng sản phẩm nhập kho và tổng chi phí mua hàng từ mỗi nhà cung cấp, hiển thị tên nhà cung cấp, tổng số lượng và tổng số tiền mua hàng.",
+        "ground_truth": "SELECT s.\"fullName\", SUM(pd.quantity) AS \"totalQuantityPurchased\", SUM(pd.total) AS \"totalCost\" FROM public.\"Supplier\" s JOIN public.\"PurchaseOrder\" po ON s.\"supplierId\" = po.\"supplierId\" JOIN public.\"PurchaseDetail\" pd ON po.\"purchaseId\" = pd.\"purchaseId\" GROUP BY s.\"fullName\";"
+    }
+]
