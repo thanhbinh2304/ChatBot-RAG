@@ -191,11 +191,12 @@ def generate_natural_answer(user_query: str, sql_data: str) -> str:
 
     system_instruction = f"{get_current_time_context()}\n{system_instruction}"
 
-    user_prompt = f"""Dưới đây là kết quả trích xuất từ cơ sở dữ liệu (định dạng JSON):
+    user_prompt = f"""Dưới đây là dữ liệu ĐÃ ĐƯỢC LỌC CHÍNH XÁC từ cơ sở dữ liệu để trả lời cho câu hỏi của người dùng (định dạng JSON):
 {sql_data}
 
-Dựa vào dữ liệu trên, hãy trả lời câu hỏi sau:
-Câu hỏi: {user_query}"""
+LƯU Ý QUAN TRỌNG: Bạn KHÔNG CẦN VÀ KHÔNG ĐƯỢC PHÉP kiểm tra xem dữ liệu này có logic với câu hỏi hay không. Hãy mặc định rằng tập JSON trên CHÍNH LÀ ĐÁP ÁN ĐÚNG cho câu hỏi. Nhiệm vụ duy nhất của bạn là trình bày lại tập dữ liệu này một cách dễ hiểu.
+
+Câu hỏi của người dùng: {user_query}"""
 
     response = ollama_client.chat(
         model=GENERAL_MODEL,

@@ -93,9 +93,9 @@ async def run_evaluation():
         retrieved_schema = get_pruned_schema(question, top_k=5)
         try:
             sql_query, raw_db_data = generate_and_execute_sql_with_retry(question, max_retries=1)
-            # Chúng ta vẫn sinh câu trả lời tự nhiên để bot hoạt động trọn vẹn, 
-            # nhưng sẽ KHÔNG lấy nó để Ragas chấm điểm.
-            bot_answer = generate_natural_answer(question, raw_db_data)
+            # BỎ QUA bước sinh câu trả lời tự nhiên (generate_natural_answer) 
+            # để tăng tốc độ đánh giá lên gấp đôi, vì chúng ta chỉ cần chấm điểm SQL.
+            bot_answer = "Bỏ qua sinh ngôn ngữ tự nhiên để tiết kiệm thời gian đánh giá."
         except Exception as e:
             sql_query = "LỖI"
             raw_db_data = ""
