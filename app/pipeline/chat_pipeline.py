@@ -50,19 +50,49 @@ def format_history_for_prompt(history: List[Dict[str, str]]) -> str:
 
 def classify_intent(query: str, history: List[Dict[str, str]]) -> str:
     """
-    Dùng General Model để phân loại câu hỏi của user (Router).
+    Dùng Hybrid Routing: Hard-rule (Regex/Keyword) + LLM (Router).
     Luật phân loại được lấy từ app/Rule/intent_rule.text
     """
-    history_str = format_history_for_prompt(history[-4:]) # Lấy 4 tin gần nhất làm ngữ cảnh
+    query_lower = query.lower()
     
+    # 1. HARD-RULE ROUTING (Fast Path)
+    # Lọc các từ khóa RAG rõ ràng (ưu tiên cao)
+    rag_keywords = ["quy trình", "hướng dẫn", "chính sách", "quy định", "tài liệu", "sop", "workflow", "cách làm", "cách thực hiện", "điều kiện"]
+    if any(k in query_lower for k in rag_keywords):
+        _logger.info("[Router] Matched RAG Keyword")
+        return "RAG"
+        
     # Đọc system prompt từ file Rule/intent_rule.text
     try:
         rule_path = os.path.join(os.path.dirname(__file__), "../Rule/intent_rule.text")
         with open(rule_path, "r", encoding="utf-8") as f:
             system_prompt_content = f.read().strip()
+            
+        # Parse danh sách từ khóa SQL từ file (những dòng bắt đầu bằng dấu *)
+        sql_keywords = []
+        for line in system_prompt_content.split('\n'):
+            line = line.strip()
+            if line.startswith('*') and len(line) < 40 and not line.endswith('?'):
+                # Extract keyword (e.g. "* danh sách khách hàng" -> "danh sách khách hàng")
+                kw = line[1:].strip().lower()
+                if kw:
+                    sql_keywords.append(kw)
+        
+        # Sắp xếp từ khóa dài lên trước để match chính xác cụm từ
+        sql_keywords.sort(key=len, reverse=True)
+        
+        for kw in sql_keywords:
+            if kw in query_lower:
+                _logger.info(f"[Router] Matched SQL Keyword: '{kw}'")
+                return "SQL"
+                
     except Exception as e:
+        _logger.error(f"[Router] Lỗi đọc rule: {e}")
         system_prompt_content = "Chỉ trả về 1 từ: SQL, RAG, hoặc CHAT."
 
+    # 2. LLM FALLBACK (Slow Path)
+    _logger.info("[Router] Falling back to LLM for classification")
+    history_str = format_history_for_prompt(history[-4:])
     system_prompt_content = f"{get_current_time_context()}\n{system_prompt_content}"
 
     user_prompt = f"""Lịch sử gần đây:
