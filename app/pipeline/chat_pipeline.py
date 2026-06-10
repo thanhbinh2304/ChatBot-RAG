@@ -147,13 +147,14 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
         docs = retrieve(user_query, top_n=3)
         context = "\n\n".join([doc['content'] for doc in docs])
         
-        rag_user_prompt = f"""Dựa vào thông tin sau để trả lời câu hỏi:
+        rag_user_prompt = f"""Dựa vào tài liệu sau, hãy trích xuất và copy-paste y nguyên nội dung để trả lời (KHÔNG ĐƯỢC TỰ DỊCH HAY ĐỔI CHỮ):
 {context}
 
 Lịch sử chat:
 {format_history_for_prompt(history[-4:])}
 
-Câu hỏi: {user_query}"""
+Câu hỏi: {user_query}
+Trả lời bằng Tiếng Việt (Giữ nguyên câu chữ của tài liệu):"""
         
         try:
             rag_rule_path = os.path.join(os.path.dirname(__file__), "../Rule/rag_instruction.text")
