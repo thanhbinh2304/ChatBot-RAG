@@ -155,12 +155,21 @@ Lịch sử chat:
 
 Câu hỏi: {user_query}"""
         
+        try:
+            rag_rule_path = os.path.join(os.path.dirname(__file__), "../Rule/rag_instruction.text")
+            with open(rag_rule_path, "r", encoding="utf-8") as f:
+                rag_system_prompt = f.read().strip()
+        except Exception as e:
+            _logger.error(f"[RAG] Lỗi đọc rule: {e}")
+            rag_system_prompt = "Bạn là trợ lý RAG. Trả lời câu hỏi ngắn gọn dựa trên ngữ cảnh."
+
         res = ollama_client.chat(
             model=GENERAL_MODEL,
             messages=[
-                {"role": "system", "content": f"{get_current_time_context()}\nBạn là một trợ lý ảo tiếng Việt hữu ích. Nhiệm vụ của bạn là trả lời câu hỏi DỰA TRÊN ngữ cảnh được cung cấp. BẮT BUỘC trả lời 100% bằng TIẾNG VIỆT, tuyệt đối không sử dụng ngôn ngữ khác."},
+                {"role": "system", "content": f"{get_current_time_context()}\n{rag_system_prompt}"},
                 {"role": "user", "content": rag_user_prompt}
-            ]
+            ],
+            options={"temperature": 0.0}
         )
         response_content = res['message']['content'].strip()
         
