@@ -156,6 +156,18 @@ def execute_sql(sql_query: str) -> str:
     """
     Thực thi câu lệnh SQL vừa sinh ra vào Database và trả về dữ liệu thô.
     """
+    query_upper = sql_query.strip().upper()
+    if not query_upper.startswith("SELECT"):
+        _logger.warning(f"[Security Block] Không phải SELECT: {sql_query}")
+        return "Lỗi truy vấn: Chỉ hỗ trợ tra cứu dữ liệu (SELECT)."
+        
+    forbidden = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "TRUNCATE", "GRANT", "REVOKE"]
+    import re
+    for kw in forbidden:
+        if re.search(r'\b' + kw + r'\b', query_upper):
+            _logger.warning(f"[Security Block] Phát hiện từ khóa {kw}: {sql_query}")
+            return "Lỗi truy vấn: Phát hiện từ khóa nguy hiểm."
+
     try:
         with engine.connect() as conn:
             # SQLAlchemy text() thực thi query
