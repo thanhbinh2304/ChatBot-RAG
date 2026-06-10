@@ -89,31 +89,49 @@ async def run_evaluation():
 
         start_time = time.perf_counter()
 
-        # LUÔN chạy Bot để kiểm tra xem SQL sinh ra có đúng với ground_truth không
-        retrieved_schema = get_pruned_schema(question, top_k=5)
-        try:
-            sql_query, raw_db_data = generate_and_execute_sql_with_retry(question, max_retries=1)
-            # BỎ QUA bước sinh câu trả lời tự nhiên (generate_natural_answer) 
-            # để tăng tốc độ đánh giá lên gấp đôi, vì chúng ta chỉ cần chấm điểm SQL.
-            bot_answer = "Bỏ qua sinh ngôn ngữ tự nhiên để tiết kiệm thời gian đánh giá."
-        except Exception as e:
-            sql_query = "LỖI"
-            raw_db_data = ""
-            bot_answer = f"Lỗi xử lý: {str(e)}"
+        is_sql = str(ground_truth).strip().upper().startswith("SELECT")
 
-        # Context = Schema (chỉ đưa schema vào context để giám khảo Ragas đối chiếu logic)
-        context_str = f"--- PRUNED SCHEMA ---\n{retrieved_schema}"
-        contexts = [context_str]
+        if is_sql:
+            # ĐÁNH GIÁ LUỒNG SQL
+            retrieved_schema = get_pruned_schema(question, top_k=5)
+            try:
+                sql_query, raw_db_data = generate_and_execute_sql_with_retry(question, max_retries=1)
+                final_answer = sql_query # Dùng SQL để chấm điểm
+            except Exception as e:
+                final_answer = "LỖI"
+            
+            contexts = [f"--- PRUNED SCHEMA ---\n{retrieved_schema}"]
+            print(f"  -> Loại: SQL | Output Bot: {final_answer}")
+            
+        else:
+            # ĐÁNH GIÁ LUỒNG RAG
+            from app.pipeline.retrieval import retrieve
+            from app.pipeline.chat_pipeline import GENERAL_MODEL, ollama_client
+            
+            retrieved_docs = retrieve(question, top_n=3)
+            context_str = "\n\n".join([doc.get("content", "") for doc in retrieved_docs])
+            contexts = [context_str]
+            
+            prompt = f"Ngữ cảnh:\n{context_str}\n\nCâu hỏi: {question}\nTrả lời ngắn gọn dựa vào ngữ cảnh:"
+            try:
+                response = ollama_client.chat(
+                    model=GENERAL_MODEL,
+                    messages=[{"role": "user", "content": prompt}],
+                    options={"temperature": 0.0}
+                )
+                final_answer = response['message']['content'].strip()
+            except Exception as e:
+                final_answer = f"Lỗi: {str(e)}"
+                
+            print(f"  -> Loại: RAG | Output Bot: {final_answer[:100]}...")
 
         latency = time.perf_counter() - start_time
         total_latency += latency
         latency_measured_count += 1
         print(f"  -> Thời gian xử lý: {latency:.2f}s")
-        print(f"  -> SQL Bot sinh ra: {sql_query}")
 
         data_for_ragas["question"].append(question)
-        # RẤT QUAN TRỌNG: Đưa câu SQL do bot TỰ SINH RA vào làm 'answer' để đối chiếu với 'ground_truth'
-        data_for_ragas["answer"].append(sql_query)
+        data_for_ragas["answer"].append(final_answer)
         data_for_ragas["contexts"].append(contexts)
         data_for_ragas["ground_truth"].append(ground_truth)
 
