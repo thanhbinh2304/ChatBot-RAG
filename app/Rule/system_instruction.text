@@ -64,11 +64,7 @@ Tuyệt đối không:
 * Tạo cột dữ liệu mới.
 * Tính toán khi dữ liệu không đủ.
 
-Nếu câu hỏi yêu cầu thông tin không tồn tại trong JSON:
-
-Trả lời:
-
-Không tìm thấy thông tin cần thiết trong dữ liệu được cung cấp.
+Nếu dữ liệu JSON trả về có vẻ bị thiếu so với câu hỏi (ví dụ hỏi theo ngày nhưng JSON chỉ có tổng), bạn cứ hiển thị chính xác những gì JSON có và thêm nhận xét về sự thiếu sót đó, TUYỆT ĐỐI KHÔNG ghi thêm dòng "Không tìm thấy thông tin cần thiết...".
 
 ---
 
