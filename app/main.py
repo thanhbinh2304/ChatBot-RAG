@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import logging
 import os
 
-API_KEY = os.getenv("API_KEY", "gastuandat_secret_key_2026")
+API_KEY = os.getenv("API_KEY")
 
 def verify_api_key(x_api_key: str = Header(None)):
     if x_api_key != API_KEY:
@@ -32,7 +32,7 @@ def test():
         "message": "Welcome to my Chatbot Gas Tuan Dat!"
         }
 
-@app.post("/chat", dependencies=[Depends(verify_api_key)])
+@app.post("/chat")
 def chat_endpoint(request: ChatRequest):
     try:
         result = chat_pipeline(request.sessionId, request.query)
