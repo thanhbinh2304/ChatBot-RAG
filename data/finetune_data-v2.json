@@ -2,8 +2,8 @@
     {
         "instruction": "Generate PostgreSQL query",
         "input": {
-            "Schema": "Schema\": \"GasBook(gasBookId, gender, dateOfBirth, points, cycles, note, fullName, \"phoneNumber\", \"email\", \"wardId\", \"cycle\", \"customerGroupid\", \"address\", \"debt\", \"gasBookCode\")\",\n         \"Question\":\"Tìm sổ gas của Nguyễn Văn A\"\n        }",
-            "Question": ""
+            "Schema": "GasBook(\"gasBookId\", \"gender\", \"dateOfBirth\", \"points\", \"cycles\", \"note\", \"fullName\", \"phoneNumber\", \"email\", \"wardId\", \"cycle\", \"customerGroupid\", \"address\", \"debt\", \"gasBookCode\")",
+            "Question":"Tìm sổ gas của Nguyễn Văn A"
         },
         "output": "SELECT * FROM \"GasBook\" WHERE \"fullName\" ILIKE '%Nguyễn Văn A%';"
     },

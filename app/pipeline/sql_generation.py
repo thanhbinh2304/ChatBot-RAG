@@ -31,11 +31,17 @@ def generate_sql(query: str) -> str:
     # Sử dụng Schema Pruning để chỉ lấy các bảng liên quan nhất (top 5)
     pruned_schema = get_pruned_schema(query, top_k=5)
     # Dựa vào format lúc bạn finetune (finetune_data.json)
+    
+    # Ép buộc logic nếu hỏi về lợi nhuận
+    profit_hint = ""
+    if "lợi nhuận" in query.lower() or "profit" in query.lower():
+        profit_hint = "\nHINT: Tính lợi nhuận (profit) BẮT BUỘC bằng công thức SUM(id.quantity * id.\"unitPrice\" - id.quantity * p.cost) bằng cách JOIN SaleInvoice, InvoiceDetail(id) và Product(p). TUYỆT ĐỐI KHÔNG DÙNG totalAmount hay discountAmount của SaleInvoice."
+
     prompt = f"""Generate PostgreSQL query
 
 ### Input:
 {pruned_schema}
-Question: {query}
+Question: {query}{profit_hint}
 
 ### Output:
 """
@@ -74,6 +80,10 @@ def fix_sql(query: str, wrong_sql: str, error_msg: str) -> str:
     """
     pruned_schema = get_pruned_schema(query, top_k=5)
     
+    profit_hint = ""
+    if "lợi nhuận" in query.lower() or "profit" in query.lower():
+        profit_hint = "\nHINT: Tính lợi nhuận (profit) BẮT BUỘC bằng công thức SUM(id.quantity * id.\"unitPrice\" - id.quantity * p.cost). TUYỆT ĐỐI KHÔNG DÙNG totalAmount hay discountAmount của SaleInvoice."
+
     prompt = f"""You are a PostgreSQL expert. The following SQL query failed with an error.
 Please fix the SQL query based on the database schema and the error message.
 
@@ -81,7 +91,7 @@ Please fix the SQL query based on the database schema and the error message.
 {pruned_schema}
 
 ### User Question:
-{query}
+{query}{profit_hint}
 
 ### Wrong SQL Query:
 {wrong_sql}

@@ -118,3 +118,10 @@ Chỉ trả về:
 - Trong PostgreSQL, các tên bảng và tên cột có chữ viết hoa (camelCase hoặc PascalCase) BẮT BUỘC phải được bọc trong dấu ngoặc kép kép ("").
 - Không được viết `stt.stockTakeDate`, mà PHẢI viết là `stt."stockTakeDate"`.
 - Luôn bọc tên bảng và cột bằng dấu ngoặc kép: `"SaleInvoice"`, `"totalAmount"`, `"stockTakeId"`, v.v.
+
+14. TÍNH LỢI NHUẬN (PROFIT)
+- Lợi nhuận (profit) LUÔN ĐƯỢC TÍNH BẰNG TỔNG CỦA: (quantity * unitPrice) - (quantity * cost) của từng mặt hàng.
+- KHÔNG dùng "totalAmount" của "SaleInvoice" vì nó là tổng tiền cả hóa đơn, khi JOIN nhiều dòng sẽ bị cộng dồn sai.
+- KHÔNG sử dụng "CashReceipt" để tính lợi nhuận.
+- Cần JOIN các bảng "SaleInvoice", "InvoiceDetail" và "Product".
+- Ví dụ: SELECT SUM(I."quantity" * I."unitPrice" - I."quantity" * P."cost") FROM "SaleInvoice" S JOIN "InvoiceDetail" I ON S."invoiceId" = I."invoiceId" JOIN "Product" P ON I."productId" = P."productId"
