@@ -10,3 +10,4 @@ rank_bm25
 sentence-transformers
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch
+

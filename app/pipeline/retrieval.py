@@ -50,16 +50,21 @@ def rewrite_query(original_query: str) -> str:
     """
     _logger.info(f"[Query Rewriting] Query gốc: {original_query}")
 
-    prompt = f"""Bạn là trợ lý giúp cải thiện câu hỏi tìm kiếm cho hệ thống RAG về quản lý cửa hàng gas.
-Hãy viết lại câu hỏi sau thành một câu hỏi rõ ràng, đầy đủ hơn, bổ sung các từ khóa liên quan để tìm kiếm hiệu quả hơn.
-Chỉ trả về câu hỏi đã viết lại, không giải thích thêm.
+    # Đọc prompt từ file Rule/rewriting_rule.text
+    try:
+        rule_path = os.path.join(os.path.dirname(__file__), "../Rule/rewriting_rule.text")
+        with open(rule_path, "r", encoding="utf-8") as f:
+            prompt_template = f.read().strip()
+    except Exception as e:
+        _logger.error(f"[Query Rewriting] Không thể đọc file rule: {e}")
+        prompt_template = "Viết lại câu hỏi sau: {original_query}"
 
-Câu hỏi gốc: {original_query}
-Câu hỏi đã viết lại:"""
+    prompt = prompt_template.replace("{original_query}", original_query)
 
     response = ollama_client.chat(
         model=REWRITING_MODEL,
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={"temperature": 0.0}
     )
     rewritten = response["message"]["content"].strip()
     _logger.info(f"[Query Rewriting] Query sau rewrite: {rewritten}")

@@ -17,18 +17,20 @@ QUY TẮC PHÂN LOẠI
 Trả về "SQL" nếu người dùng muốn tra cứu dữ liệu từ hệ thống.
 
 Bao gồm:
-
+* Số lượng
 * Doanh thu
 * Lợi nhuận
 * Đơn hàng
 * Hóa đơn
 * Khách hàng
+* Nhân viên, nhân sự
 * Nhà cung cấp
 * Sản phẩm
 * Tồn kho
 * Công nợ
 * Thống kê
 * Báo cáo
+* Danh sách
 * Số lượng
 * Tổng tiền
 * Giá trị
@@ -36,11 +38,124 @@ Bao gồm:
 * Top khách hàng
 * So sánh số liệu
 * Dữ liệu theo ngày/tháng/năm
+* doanh thu
+* bán hàng
+* hóa đơn
+* đơn hàng
+* phiếu bán
+* phiếu nhập
+* nhập hàng
+* xuất hàng
+* tồn kho
+* kiểm kho
+* chuyển kho
+* kho hàng
+* cửa hàng
+* chi nhánh
+* sản phẩm
+* hàng hóa
+* mặt hàng
+* danh mục sản phẩm
+* nhóm sản phẩm
+* loại sản phẩm
+* giá vốn
+* giá nhập
+* giá bán
+* bảng giá
+* chi phí
+* lợi nhuận
+* chiết khấu
+* giảm giá
+* thanh toán
+* tiền mặt
+* qr
+* công nợ
+* nợ khách
+* nợ nhà cung cấp
+* thu tiền
+* chi tiền
+* phiếu thu
+* phiếu chi
+* dòng tiền
+* giao dịch
+
+* khách hàng
+* danh sách khách hàng
+* khách mới
+* khách cũ
+* khách vip
+* nhóm khách hàng
+* sổ gas
+* khách mua gas
+* thông tin khách hàng
+* lịch sử mua hàng
+
+* nhà cung cấp
+* danh sách nhà cung cấp
+* công nợ nhà cung cấp
+* mua hàng
+* đặt hàng
+* nguồn hàng
+* thuế
+* mã số thuế
+* thông tin nhà cung cấp
+* giao dịch nhà cung cấp
+
+* nhân viên
+* danh sách nhân viên
+* doanh số nhân viên
+* hiệu suất nhân viên
+* người tạo
+* người bán
+* chức vụ
+* tài khoản
+* username
+* vai trò
+* kho nào
+* cửa hàng nào
+* chi nhánh nào
+* phường
+* xã
+* khu vực
+* địa chỉ
+* địa bàn
+
+* bao nhiêu
+* bao nhiêu tiền
+* bao nhiêu đơn
+* bao nhiêu khách
+* bao nhiêu sản phẩm
+* số lượng
+* tổng số
+* tổng tiền
+* giá trị
+* cao nhất
+* thấp nhất
+* nhiều nhất
+* ít nhất
+* lớn nhất
+* nhỏ nhất
+* top
+* xếp hạng
+* thống kê
+* báo cáo
+
+* hôm nay
+* hôm qua
+* tuần này
+* tháng này
+* quý này
+* năm nay
+* theo ngày
+* theo tháng
+* theo năm
 
 Ví dụ:
 
 * Doanh thu tháng này là bao nhiêu?
 * Có bao nhiêu khách hàng mới?
+* Lấy ra danh sách nhân viên gồm họ tên ngày sinh giới tính.
+* Số lượng nhân viên trong công ty hiện tại?
 * Top 10 sản phẩm bán chạy.
 * Tồn kho hiện tại của sản phẩm A.
 * Tổng số đơn hàng hôm nay.

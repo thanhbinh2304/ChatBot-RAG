@@ -6,21 +6,22 @@ from rank_bm25 import BM25Okapi
 FULL_SCHEMA = """-- BẢNG DỮ LIỆU CỦA HỆ THỐNG GAS TUẤN ĐẠT --
 Account(accountId [PK], username, password, status, createdAt, updatedAt, roleId [FK -> Role.roleId], deleteAt, employeeId [FK -> Employee.employeeId]) -- Tài khoản người dùng
 Area(areaId [PK], areaName) -- Khu vực
-CashReceipt(receiptId [PK], receiptDate, receiptAmount, note, customerId [FK -> Customer.customerId], createdBy [FK -> Employee.employeeId], transactionTypeId [FK -> TransactionType.transactionTypeId], invoiceId [FK -> SaleInvoice.invoiceId], PaymentMethod, objectId [FK -> Object.objectId], supplierId [FK -> Supplier.supplierId], receiptCode, createdDate, employeeId) -- Phiếu thu tiền (Tiền vào)
+CashReceipt(receiptId [PK], receiptDate, receiptAmount, note, customerId [FK -> Customer.customerId], createdBy [FK -> Employee.employeeId], transactionTypeId [FK -> TransactionType.transactionTypeId], invoiceId [FK -> SaleInvoice.invoiceId], PaymentMethod [ENUM: 'Cashes', 'QR_Code'], objectId [FK -> Object.objectId], supplierId [FK -> Supplier.supplierId], receiptCode, createdDate, employeeId) -- Phiếu thu tiền (Tiền vào)
 Customer(customerId [PK], gender, dateOfBirth, note, fullName, phoneNumber, email, wardId [FK -> Ward.wardId], customerGroupId [FK -> CustomerGroup.customerGroupid], customerCode, address, debt) -- Khách hàng
 CustomerGroup(customerGroupId, groupName) -- Loại khách hàng
 Employee(employeeId [PK], employeeCode, positionId [FK -> Position.positionId], note, status, hireDate, createdAt, updatedAt, gender, dateOfBirth, phoneNumber, fullName, email, wardId) -- Nhân viên
 GasBook(gasBookId [PK], gender, dateOfBirth, points, cycles, note, fullName, phoneNumber, email, wardId [FK -> Ward.wardId], cycle, customerGroupid [FK -> CustomerGroup.customerGroupid], address, debt, gasBookCode) -- Sổ Gas của khách hàng
 Inventory(stockId [FK -> Stock.stockId], productId [FK -> Product.productId], quantity, inventoryId [PK]) -- Tồn kho hàng hóa
 InvoiceDetail(id, quantity, total, unitPrice, invoiceId, productId) -- Chi tiết các mặt hàng trong Hóa đơn bán (SaleInvoice)
-Payment(paymentId [PK], paymentDate, paymentAmount, notes, objectId [FK -> Object.objectId], createdBy [FK -> Employee.employeeId], transactionTypeId [FK -> TransactionType.transactionTypeId], purchaseId [FK -> PurchaseOrder.purchaseId], stockId [FK -> Stock.stockId], paymentMethod, supplierId [FK -> Supplier.supplierId], customerId [FK -> Customer.customerId], employeeId, paymentCode) -- Phiếu chi tiền (Tiền ra)
+Object(objectId [PK], objectCode, objectName, objectType [ENUM: 'Nhanvien', 'Nhacungcap', 'Khachhang', 'Sogas'], wardId [FK -> Ward.wardId]) -- Đối tượng thu chi
+Payment(paymentId [PK], paymentDate, paymentAmount, notes, objectId [FK -> Object.objectId], createdBy [FK -> Employee.employeeId], transactionTypeId [FK -> TransactionType.transactionTypeId], purchaseId [FK -> PurchaseOrder.purchaseId], stockId [FK -> Stock.stockId], paymentMethod [ENUM: 'Cashes', 'QR_Code'], supplierId [FK -> Supplier.supplierId], customerId [FK -> Customer.customerId], employeeId, paymentCode) -- Phiếu chi tiền (Tiền ra)
 Position(positionId [PK], name) -- Chức vụ nhân viên
 PriceList(priceListId [PK], priceListName) -- Bảng giá
 Product(productId [PK], productName, unit, cost, categoryId [FK -> ProductCategory.categoryId], note, productCode) -- Thông tin sản phẩm / hàng hóa
 ProductCategory(categoryId [PK], categoryName) -- Danh mục sản phẩm
 PurchaseDetail(purchaseId [FK -> PurchaseOrder.purchaseId], productId [FK -> Product.productId], quantity, purchasePrice, total, id) -- Chi tiết các mặt hàng trong phiếu nhập
-PurchaseOrder(purchaseId [PK], purchaseDate, totalAmount, employeeId [FK -> Employee.employeeId], supplierId [FK -> Supplier.supplierId], note, orderType, stockId [FK -> Stock.stockId], discountAmount, paidAmount, purchaseCode) -- Phiếu nhập hàng / Mua hàng từ nhà cung cấp
-SaleInvoice(invoiceId [PK], invoiceDate, totalAmount, discountAmount, paidAmount, note, employeeId [FK -> Employee.employeeId], customerId [FK -> Customer.customerId], gasBookId [FK -> GasBook.gasBookId], stockId [FK -> Stock.stockId], orderType, invoiceCode, PaymentMethod) -- Hóa đơn bán hàng / Doanh thu bán hàng
+PurchaseOrder(purchaseId [PK], purchaseDate, totalAmount, employeeId [FK -> Employee.employeeId], supplierId [FK -> Supplier.supplierId], note, orderType [ENUM: 'Dathang' (Đặt), 'Xuathang' (Bán/Doanh thu), 'Nhaphang' (Nhập)], stockId [FK -> Stock.stockId], discountAmount, paidAmount, purchaseCode) -- Phiếu nhập hàng / Mua hàng từ nhà cung cấp
+SaleInvoice(invoiceId [PK], invoiceDate, totalAmount, discountAmount, paidAmount, note, employeeId [FK -> Employee.employeeId], customerId [FK -> Customer.customerId], gasBookId [FK -> GasBook.gasBookId], stockId [FK -> Stock.stockId], orderType [ENUM: 'Dathang' (Đặt), 'Xuathang' (Bán/Doanh thu), 'Nhaphang' (Nhập)], invoiceCode, PaymentMethod [ENUM: 'Cashes', 'QR_Code']) -- Hóa đơn bán hàng / Doanh thu bán hàng
 Stock(name, wardId [FK -> Ward.wardId], stockId [PK]) -- Cửa hàng / Kho chứa
 StockTake(stockTakeId [PK], stockTakeDate, note, employeeId [FK -> Employee.employeeId], stockId [FK -> Stock.stockId], stockTakeCode) -- Phiếu kiểm kho
 StockTakeDetail(stockTakeId [FK -> StockTake.stockTakeId], productId [FK -> Product.productId], systymQuantity, actualQuantity, id) -- Chi tiết kiểm kho
