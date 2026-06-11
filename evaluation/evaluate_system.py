@@ -6,7 +6,6 @@ import asyncio
 from datasets import Dataset
 from dotenv import load_dotenv
 
-# Reconfigure stdout for utf-8 on Windows
 if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
@@ -32,7 +31,7 @@ from ragas.run_config import RunConfig
 # pyrefly: ignore [missing-import]
 from ragas.metrics import Faithfulness, AnswerRelevancy, AnswerCorrectness
 
-# pyrefly: ignore [missing-import]
+
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 # Thêm thư mục gốc vào sys.path để import từ app/pipeline/
@@ -51,7 +50,6 @@ async def run_evaluation():
     print("=" * 60)
 
     # Giám khảo: Sử dụng Gemini (gemini-1.5-flash) để đánh giá
-    # Yêu cầu phải có biến môi trường GEMINI_API_KEY trong file .env
     judge_llm = ChatGoogleGenerativeAI(model="gemma-4-31b-it", temperature=0)
     judge_embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
@@ -70,12 +68,12 @@ async def run_evaluation():
     total_latency = 0.0
     latency_measured_count = 0
 
-    # ragas 0.1.21 dùng cột: "question", "answer", "contexts", "ground_truth"
+
     data_for_ragas = {
         "question": [],
         "answer": [],
         "contexts": [],
-        "ground_truth": [] # Thêm cột ground_truth cho metric answer_correctness
+        "ground_truth": [] 
     }
 
     # Chạy thử toàn bộ test_data
