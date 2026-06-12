@@ -117,6 +117,46 @@ Phân loại:"""
     return "CHAT"
 
 
+def contextualize_query(query: str, history: List[Dict[str, str]]) -> str:
+    """Viết lại câu hỏi mới dựa trên lịch sử để cung cấp đầy đủ ngữ cảnh."""
+    if not history:
+        return query
+    
+    _logger.info("[Contextualization] Rewriting query using history...")
+    history_str = format_history_for_prompt(history[-4:])
+    
+    system_prompt = f"{get_current_time_context()}\nBạn là trợ lý AI. Dựa vào lịch sử chat, hãy viết lại câu hỏi mới nhất của người dùng thành một câu độc lập, đầy đủ chủ ngữ vị ngữ và ngữ cảnh. ĐẶC BIỆT LƯU Ý: Giữ nguyên y hệt các từ khóa quan trọng (mã số, tên riêng, phân loại như 'khách lẻ', 'SG0003'), KHÔNG được viết liền từ, KHÔNG bỏ dấu tiếng Việt. Chỉ trả về câu hỏi đã viết lại, không giải thích dài dòng."
+    
+    user_prompt = f"Lịch sử:\n{history_str}\n\nCâu hỏi mới: {query}\n\nViết lại câu hỏi:"
+    
+    try:
+        response = ollama_client.chat(
+            model=GENERAL_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            options={"temperature": 0.0}
+        )
+        rewritten = response['message']['content'].strip()
+        
+        # Loại bỏ các prefix nếu AI lỡ trả lời kiểu "Câu hỏi viết lại là: abc"
+        if ":" in rewritten and len(rewritten.split(":")) == 2:
+             rewritten = rewritten.split(":")[-1].strip()
+             
+        # Bỏ dấu ngoặc kép ở hai đầu nếu có
+        rewritten = rewritten.strip('"').strip("'")
+             
+        # Fallback an toàn nếu LLM sinh ra câu quá dài hoặc rỗng
+        if len(rewritten) > len(query) + 200 or not rewritten:
+            return query
+            
+        _logger.info(f"[Contextualization] Original: '{query}' -> Rewritten: '{rewritten}'")
+        return rewritten
+    except Exception as e:
+        _logger.error(f"[Contextualization] Error: {e}")
+        return query
+
 
 def chat_pipeline(session_id: str, user_query: str) -> dict:
     _logger.info(f"[Chat] Session {session_id} - Query: {user_query}")
@@ -124,8 +164,11 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
     # 1. Lấy lịch sử
     history = get_chat_history(session_id)
     
-    # 2. Phân loại
-    intent = classify_intent(user_query, history)
+    # 1.5. Viết lại câu hỏi dựa trên lịch sử (Khắc phục lỗi mất trí nhớ)
+    contextualized_query = contextualize_query(user_query, history)
+    
+    # 2. Phân loại bằng câu hỏi đã có đầy đủ ngữ cảnh
+    intent = classify_intent(contextualized_query, history)
     _logger.info(f"[Chat] Intent được phân loại: {intent}")
     
     response_content = ""
@@ -133,18 +176,18 @@ def chat_pipeline(session_id: str, user_query: str) -> dict:
     
     # 3. Định tuyến (Router)
     if intent == "SQL":
-        # Bước A & B: Sinh SQL, Chạy và Tự sửa lỗi (Reflexion)
-        sql_query, raw_db_data = generate_and_execute_sql_with_retry(user_query, max_retries=2)
+        # Bước A & B: Sinh SQL, Chạy và Tự sửa lỗi (Reflexion) bằng câu đã viết lại
+        sql_query, raw_db_data = generate_and_execute_sql_with_retry(contextualized_query, max_retries=2)
         _logger.info(f"[Chat] SQL Executed (After Reflection): {sql_query}")
         sql_executed = sql_query
         _logger.info(f"[Chat] Database trả về: {raw_db_data}")
         
         # Bước C: Cho LLM dịch cục JSON thành câu trả lời tự nhiên
-        response_content = generate_natural_answer(user_query, raw_db_data)
+        response_content = generate_natural_answer(contextualized_query, raw_db_data)
         
     elif intent == "RAG":
-        # Sử dụng hàm retrieve đã có từ retrieval.py
-        docs = retrieve(user_query, top_n=1)
+        # Sử dụng hàm retrieve đã có từ retrieval.py bằng câu đã viết lại
+        docs = retrieve(contextualized_query, top_n=1)
         
         if not docs:
             response_content = "Xin lỗi, tôi không tìm thấy tài liệu nào liên quan đến câu hỏi của bạn trong hệ thống nội bộ."

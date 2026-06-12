@@ -65,12 +65,12 @@ JOIN Orders o ON c.CustomerID = o.CustomerID
   sử dụng:
   LIMIT N
 
-8. TÌM KIẾM CHUỖI (QUAN TRỌNG)
+8. TÌM KIẾM CHUỖI VÀ TỪ KHÓA (QUAN TRỌNG)
 - BẮT BUỘC dùng ILIKE thay vì LIKE để tìm kiếm chuỗi (string) trong PostgreSQL (để không phân biệt chữ hoa/chữ thường).
-- Nếu người dùng tìm kiếm tên người, số điện thoại, mã... luôn bọc bằng `%`.
-- TUYỆT ĐỐI KHÔNG bỏ dấu tiếng Việt khi tìm kiếm. Ví dụ người dùng hỏi "bình gas" thì BẮT BUỘC dùng `ILIKE '%Bình%'`, tuyệt đối KHÔNG dùng `%Binh%`. Nếu người dùng gõ có dấu thì phải truyền đúng nguyên văn có dấu vào câu lệnh SQL.
-Ví dụ: 
-ILIKE '%Bình%'
+- Nếu người dùng tìm kiếm tên người, số điện thoại, mã, hoặc phân loại (ví dụ: khách lẻ)... luôn bọc bằng `%`.
+- TUYỆT ĐỐI KHÔNG bỏ dấu tiếng Việt, KHÔNG viết liền các từ. Phải giữ nguyên vẹn từng khoảng trắng (dấu cách) và chữ cái của từ khóa.
+- Ví dụ: Người dùng hỏi "nhóm khách lẻ" thì BẮT BUỘC dùng `ILIKE '%khách lẻ%'`. TUYỆT ĐỐI KHÔNG được viết liền thành `%KhachLe%`.
+- Nếu gõ có dấu thì phải truyền đúng nguyên văn có dấu và khoảng trắng vào SQL.
 
 9. NGÀY THÁNG VÀ THỜI GIAN (QUAN TRỌNG)
 - Luôn dùng định dạng: YYYY-MM-DD.
